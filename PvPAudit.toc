@@ -1,0 +1,9 @@
+## Interface: 60200
+## Title: PvPAudit
+## Notes: Displays a player's PvP experience and CR
+## Author: Exupery - Tichondrius
+## Version: 1.0
+## SavedVariables: PvPAuditPlayerCache
+
+PvPAudit.lua
+
