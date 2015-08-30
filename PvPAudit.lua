@@ -3,6 +3,13 @@ SLASH_PVPAUDIT2 = "/pa"
 
 local eventFrame = nil
 
+local achievements = {
+	[1174] = "Arena Master",
+	[2091] = "Gladiator",
+	[6941] = "Hero of the Horde",
+	[6942] = "Hero of the Alliance"
+}
+
 local function colorPrint(msg)
   print("|cffb2b2b2" .. msg)
 end
@@ -23,10 +30,11 @@ local function audit()
 end
 
 local function onInspectReady()
-	print("INSPECT_ACHIEVEMENT_READY")  -- TODO DELME
-  local completed, month, day, year = GetAchievementComparisonInfo(401)
-  print(completed)  -- TODO DELME
-  print(year)  -- TODO DELME
+	for k, v in pairs(achievements) do
+	  local completed = GetAchievementComparisonInfo(k)
+	  if completed then print(v) end
+	end
+
 	eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
 	ClearAchievementComparisonUnit()
 end
