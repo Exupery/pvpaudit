@@ -4,6 +4,7 @@ SLASH_PVPAUDIT2 = "/pa"
 local eventFrame = nil
 
 local TARGET = "target"
+local BRACKETS = { "2v2", "3v3", "5v5", "RBG" }
 
 local achievements = {
 	[1174] = "Arena Master",
@@ -11,6 +12,15 @@ local achievements = {
 	[6941] = "Hero of the Horde",
 	[6942] = "Hero of the Alliance"
 }
+
+local statistics = {
+	[BRACKETS[1]] = 370,
+	[BRACKETS[2]] = 595,
+	[BRACKETS[3]] = 596,
+	[BRACKETS[4]] = nil
+}
+
+local targetRatings = {}
 
 local function colorPrint(msg)
   print("|cffb2b2b2" .. msg)
@@ -26,11 +36,12 @@ local function errorPrint(err)
 end
 
 local function audit()
-	local success = SetAchievementComparisonUnit(TARGET)
 	local canInspect = CanInspect(TARGET, false)
 
-	if success and canInspect then
-		eventFrame:RegisterEvent("INSPECT_ACHIEVEMENT_READY")
+	if canInspect then
+		NotifyInspect(TARGET)
+		eventFrame:RegisterEvent("INSPECT_HONOR_UPDATE")
+		RequestInspectHonorData()
 	else
 		errorPrint("Unable to audit")
 	end
@@ -45,6 +56,30 @@ local function printHeader()
 	classColorPrint(str, localeIndependentClass)
 end
 
+local function getRatings()
+	for i, b in pairs(BRACKETS) do
+	  local cr = GetPersonalRatedInfo(i)
+	  targetRatings[b] = cr
+	end
+end
+
+local function getRbgHighest()
+	return 0 -- TODO
+end
+
+local function printRatings()
+	for _, b in pairs(BRACKETS) do
+	  local highest
+	  if b ~= "RBG" then
+	  	highest = GetComparisonStatistic(statistics[b])
+  	else
+  		highest = getRbgHighest()
+  	end
+
+	  print(b .. "   " .. targetRatings[b] .. " CR |cffb2b2b2[" .. highest .. " EXP]")
+	end
+end
+
 local function printAchievements()
 	for k, v in pairs(achievements) do
 	  local completed = GetAchievementComparisonInfo(k)
@@ -52,18 +87,30 @@ local function printAchievements()
 	end
 end
 
-local function onInspectReady()
+local function onHonorInspectReady()
+	getRatings()
+
+	eventFrame:RegisterEvent("INSPECT_ACHIEVEMENT_READY")
+	SetAchievementComparisonUnit(TARGET)
+
+	eventFrame:UnregisterEvent("INSPECT_HONOR_UPDATE")
+end
+
+local function onAchievementInspectReady()
 	printHeader()
-	-- TODO PRINT CR
+	printRatings()
 	printAchievements()
 
 	eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
 	ClearAchievementComparisonUnit()
+	ClearInspectPlayer()
 end
 
 local function eventHandler(self, event, unit, ...)
-  if event == "INSPECT_ACHIEVEMENT_READY" then
-  	onInspectReady()
+	if event == "INSPECT_HONOR_UPDATE" then
+		onHonorInspectReady()
+  elseif event == "INSPECT_ACHIEVEMENT_READY" then
+  	onAchievementInspectReady()
   end
 end
 
