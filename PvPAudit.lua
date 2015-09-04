@@ -1,5 +1,7 @@
 SLASH_PVPAUDIT1 = "/pvpaudit"
 SLASH_PVPAUDIT2 = "/pa"
+BINDING_HEADER_PVPAUDIT = "PvPAudit"
+BINDING_NAME_PVPAUDIT1 = "Audit the current target"
 
 local eventFrame = nil
 
@@ -125,6 +127,11 @@ local function printHelp()
 	colorPrint("PvPAudit commands:")
   print("/pvpaudit - audit the current target")
   print("/pvpaudit ? or /pvpaudit help - Print this list")
+end
+
+-- global function for keybinding
+function pvpaudit()
+	audit()
 end
 
 SlashCmdList["PVPAUDIT"] = function(arg)
