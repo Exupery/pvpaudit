@@ -60,7 +60,7 @@ end
 
 local function getRatings()
 	for i, b in pairs(BRACKETS) do
-	  local cr = GetPersonalRatedInfo(i)
+	  local cr = GetInspectArenaData(i)
 	  targetRatings[b] = cr
 	end
 end
@@ -94,8 +94,6 @@ local function onHonorInspectReady()
 
 	eventFrame:RegisterEvent("INSPECT_ACHIEVEMENT_READY")
 	SetAchievementComparisonUnit(TARGET)
-
-	eventFrame:UnregisterEvent("INSPECT_HONOR_UPDATE")
 end
 
 local function onAchievementInspectReady()
@@ -104,6 +102,7 @@ local function onAchievementInspectReady()
 	printAchievements()
 
 	eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
+	eventFrame:UnregisterEvent("INSPECT_HONOR_UPDATE")
 	ClearAchievementComparisonUnit()
 	ClearInspectPlayer()
 end
