@@ -39,7 +39,7 @@ local rbgRatings = {
 	[2400] = {5343, 5356}
 }
 
-local targetRatings = {}
+local targetCurrentRatings = {}
 
 local function colorPrint(msg)
   print("|cffb2b2b2" .. msg)
@@ -55,6 +55,9 @@ local function errorPrint(err)
 end
 
 local function audit()
+	ClearAchievementComparisonUnit()
+	ClearInspectPlayer()
+
 	local canInspect = CanInspect(TARGET, false)
 
 	if canInspect then
@@ -75,12 +78,12 @@ local function printHeader()
 	classColorPrint(str, localeIndependentClass)
 end
 
-local function getRatings()
-	targetRatings = {}
+local function getCurrentRatings()
+	targetCurrentRatings = {}
 
 	for i, b in pairs(BRACKETS) do
 	  local cr = GetInspectArenaData(i)
-	  targetRatings[b] = cr
+	  targetCurrentRatings[b] = cr
 	end
 end
 
@@ -107,7 +110,7 @@ local function printRatings()
   		highest = getRbgHighest()
   	end
 
-	  print(b .. "   " .. highest .. " EXP |cffb2b2b2[" .. targetRatings[b] .. " CR]")
+	  print(b .. "   " .. highest .. " EXP |cffb2b2b2[" .. targetCurrentRatings[b] .. " CR]")
 	end
 end
 
@@ -119,7 +122,7 @@ local function printAchievements()
 end
 
 local function onHonorInspectReady()
-	getRatings()
+	getCurrentRatings()
 
 	eventFrame:RegisterEvent("INSPECT_ACHIEVEMENT_READY")
 	SetAchievementComparisonUnit(TARGET)
@@ -132,8 +135,6 @@ local function onAchievementInspectReady()
 
 	eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
 	eventFrame:UnregisterEvent("INSPECT_HONOR_UPDATE")
-	ClearAchievementComparisonUnit()
-	ClearInspectPlayer()
 end
 
 local function eventHandler(self, event, unit, ...)
