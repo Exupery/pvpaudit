@@ -6,7 +6,7 @@ Please note Blizzard requires some proximity to collect the necessary data so ru
 
 ## Output
 * Current rating for each arena bracket and RBGs
-* Highest rating ever reached for each arena bracket and RBGs
+* Highest rating ever reached for each arena bracket and RBGs (the exact highest rating can only be obtained for arenas, for RBGs the highest achievement earned is used)
 * Notable PvP achievements (e.g. Gladiator, Arena Master)
 
 ## Commands

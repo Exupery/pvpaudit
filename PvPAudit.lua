@@ -22,6 +22,23 @@ local statistics = {
 	[BRACKETS[4]] = nil
 }
 
+local rbgRatings = {
+	[1100] = {5330, 5345},
+	[1200] = {5331, 5346},
+	[1300] = {5332, 5347},
+	[1400] = {5333, 5348},
+	[1500] = {5334, 5349},
+	[1600] = {5335, 5350},
+	[1700] = {5336, 5351},
+	[1800] = {5337, 5352},
+	[1900] = {5359, 5338},
+	[2000] = {5339, 5353},
+	[2100] = {5340, 5354},
+	[2200] = {5341, 5355},
+	[2300] = {5357, 5342},
+	[2400] = {5343, 5356}
+}
+
 local targetRatings = {}
 
 local function colorPrint(msg)
@@ -59,6 +76,8 @@ local function printHeader()
 end
 
 local function getRatings()
+	targetRatings = {}
+
 	for i, b in pairs(BRACKETS) do
 	  local cr = GetInspectArenaData(i)
 	  targetRatings[b] = cr
@@ -66,7 +85,17 @@ local function getRatings()
 end
 
 local function getRbgHighest()
-	return 0 -- TODO
+	local highest = 0
+	for rating, ids in pairs(rbgRatings) do
+	  local completed = GetAchievementComparisonInfo(ids[1]) or GetAchievementComparisonInfo(ids[2])
+	  if completed and rating > highest then highest = rating end
+	end
+
+	if highest == 0 then
+		return "--"
+	else
+		return highest .. "+"
+	end
 end
 
 local function printRatings()
