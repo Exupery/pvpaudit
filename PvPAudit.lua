@@ -78,7 +78,7 @@ local function printRatings()
   		highest = getRbgHighest()
   	end
 
-	  print(b .. "   " .. targetRatings[b] .. " CR |cffb2b2b2[" .. highest .. " EXP]")
+	  print(b .. "   " .. highest .. " EXP |cffb2b2b2[" .. targetRatings[b] .. " CR]")
 	end
 end
 
