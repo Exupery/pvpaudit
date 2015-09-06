@@ -13,7 +13,7 @@ Please note Blizzard requires some proximity to collect the necessary data so ru
 * `/pvpaudit` - audit the current target
 * `/pvpaudit ?` or `/pvpaudit help` - print the command list
 
-Commands can be ran with `/pa` instead of `/pvpaudit` - unless another addon is in use that registers `/pa` (in which case the longer option should be used). Additionally, auditing the current target can be keyboud via the WoW keybinding interface (Key Bindings => Addons => PvPAudit).
+Commands can be ran with `/pa` instead of `/pvpaudit` - unless another addon is in use that registers `/pa` (in which case the longer option should be used). Additionally, auditing the current target can be keybound via the WoW keybinding interface (Key Bindings => Addons => PvPAudit).
 
 ## TODOs
 * add option to output to /instance
