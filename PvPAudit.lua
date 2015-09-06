@@ -7,6 +7,7 @@ local eventFrame = nil
 
 local TARGET = "target"
 local BRACKETS = { "2v2", "3v3", "5v5", "RBG" }
+local DELAY = 0.25
 
 local achievements = {
 	[1174] = "Arena Master",
@@ -41,6 +42,9 @@ local rbgRatings = {
 
 local targetCurrentRatings = {}
 
+local elapsed = 0
+local honorInspectCalled = false
+
 local function colorPrint(msg)
   print("|cffb2b2b2" .. msg)
 end
@@ -61,9 +65,8 @@ local function audit()
 	local canInspect = CanInspect(TARGET, false)
 
 	if canInspect then
+		eventFrame:RegisterEvent("INSPECT_READY")
 		NotifyInspect(TARGET)
-		eventFrame:RegisterEvent("INSPECT_HONOR_UPDATE")
-		RequestInspectHonorData()
 	else
 		errorPrint("Unable to audit")
 	end
@@ -121,6 +124,24 @@ local function printAchievements()
 	end
 end
 
+local function printAll()
+	printHeader()
+	printRatings()
+	printAchievements()
+end
+
+local function cleanup()
+	honorInspectCalled = false
+	eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
+	eventFrame:UnregisterEvent("INSPECT_HONOR_UPDATE")
+	eventFrame:UnregisterEvent("INSPECT_READY")
+end
+
+local function onInspectReady()
+	eventFrame:RegisterEvent("INSPECT_HONOR_UPDATE")
+	RequestInspectHonorData()
+end
+
 local function onHonorInspectReady()
 	getCurrentRatings()
 
@@ -129,19 +150,28 @@ local function onHonorInspectReady()
 end
 
 local function onAchievementInspectReady()
-	printHeader()
-	printRatings()
-	printAchievements()
+	printAll()
+	cleanup()
+end
 
-	eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
-	eventFrame:UnregisterEvent("INSPECT_HONOR_UPDATE")
+-- use a delay because INSPECT_HONOR_UPDATE lies
+local function updateHandler(self, sinceLast)
+	elapsed = elapsed + sinceLast
+	if elapsed > DELAY then
+		honorInspectCalled = true
+		elapsed = 0
+		eventFrame:SetScript("OnUpdate", nil)
+		onHonorInspectReady()
+	end
 end
 
 local function eventHandler(self, event, unit, ...)
-	if event == "INSPECT_HONOR_UPDATE" then
-		onHonorInspectReady()
+	if event == "INSPECT_HONOR_UPDATE" and not honorInspectCalled then
+		eventFrame:SetScript("OnUpdate", updateHandler)
   elseif event == "INSPECT_ACHIEVEMENT_READY" then
   	onAchievementInspectReady()
+	elseif event == "INSPECT_READY" then
+		onInspectReady()
   end
 end
 
