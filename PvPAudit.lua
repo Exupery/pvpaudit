@@ -7,7 +7,7 @@ local eventFrame = nil
 
 local TARGET = "target"
 local BRACKETS = { "2v2", "3v3", "5v5", "RBG" }
-local DELAY = 0.25
+local DELAY = 0.35
 
 local achievements = {
   [1174] = "Arena Master",
