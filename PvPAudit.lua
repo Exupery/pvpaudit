@@ -44,6 +44,8 @@ local targetCurrentRatings = {}
 
 local attempts = 0
 
+local printTo = nil
+
 local function colorPrint(msg)
   print("|cffb2b2b2" .. msg)
 end
@@ -57,34 +59,48 @@ local function errorPrint(err)
   print("|cffff0000" .. err)
 end
 
+local function output(msg)
+  if printTo == nil then
+    print(msg)
+  else
+    SendChatMessage(msg, printTo)
+  end
+
+end
+
 local function init()
   ClearAchievementComparisonUnit()
   ClearInspectPlayer()
 end
 
+local function cleanup()
+  eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
+  eventFrame:UnregisterEvent("INSPECT_HONOR_UPDATE")
+  eventFrame:UnregisterEvent("INSPECT_READY")
+  attempts = 0
+  printTo = nil
+end
+
 local function audit()
   init()
 
-  local resetAttempts = false
+  local reset = true
   local canInspect = CanInspect(TARGET, false)
 
   if canInspect then
     local inRange = UnitIsVisible(TARGET) or CheckInteractDistance(TARGET, 1)
     if inRange then
+      reset = false
       eventFrame:RegisterEvent("INSPECT_READY")
       NotifyInspect(TARGET)
     else
       errorPrint("Out of range")
-      resetAttempts = true
     end
   else
     errorPrint("Unable to audit")
-    resetAttempts = true
   end
 
-  if resetAttempts then
-    attempts = 0
-  end
+  if reset then cleanup() end
 end
 
 local function printHeader()
@@ -93,7 +109,11 @@ local function printHeader()
   local _, localeIndependentClass = UnitClass(TARGET)
   local str = string.format("PvPAudit for %s %s", name, realm)
 
-  classColorPrint(str, localeIndependentClass)
+  if printTo == nil then
+    classColorPrint(str, localeIndependentClass)
+  else
+    output(str)
+  end
 end
 
 local function getCurrentRatings()
@@ -144,14 +164,18 @@ local function printRatings()
       highest = getRbgHighest()
     end
 
-    print(b .. "   " .. highest .. " EXP |cffb2b2b2[" .. targetCurrentRatings[b] .. " CR]")
+    local str = b .. "   " .. highest .. " EXP "
+    if printTo == nil then str = str .. "|cffb2b2b2" end
+    str = str .. "[" .. targetCurrentRatings[b] .. " CR]"
+
+    output(str)
   end
 end
 
 local function printAchievements()
   for k, v in pairs(achievements) do
     local completed = GetAchievementComparisonInfo(k)
-    if completed then print(v) end
+    if completed then output(v) end
   end
 end
 
@@ -159,13 +183,6 @@ local function printAll()
   printHeader()
   printRatings()
   printAchievements()
-end
-
-local function cleanup()
-  eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
-  eventFrame:UnregisterEvent("INSPECT_HONOR_UPDATE")
-  eventFrame:UnregisterEvent("INSPECT_READY")
-  attempts = 0
 end
 
 local function onInspectReady()
@@ -209,6 +226,9 @@ end
 local function printHelp()
   colorPrint("PvPAudit commands:")
   print("/pvpaudit - audit the current target")
+  print("/pvpaudit i or /pvpaudit instance - audit the current target and output to /instance")
+  print("/pvpaudit p or /pvpaudit party - audit the current target and output to /party")
+  print("/pvpaudit r or /pvpaudit raid - audit the current target and output to /raid")
   print("/pvpaudit ? or /pvpaudit help - Print this list")
 end
 
@@ -221,6 +241,16 @@ SlashCmdList["PVPAUDIT"] = function(arg)
   if arg == "?" or arg == "help" then
     printHelp()
   else
+    if arg == "i" or arg == "instance" then
+      printTo = "INSTANCE_CHAT"
+    elseif arg == "p" or arg == "party" then
+      printTo = "PARTY"
+    elseif arg == "r" or arg == "raid" then
+      printTo = "RAID"
+    else
+      printTo = nil
+    end
+
     audit()
   end
 end
