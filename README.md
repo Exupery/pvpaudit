@@ -20,6 +20,5 @@ Please note Blizzard requires some proximity to collect the necessary data so ru
 Commands can be ran with `/pa` instead of `/pvpaudit` - unless another addon is in use that registers `/pa` (in which case the longer option should be used). Additionally, auditing the current target can be keybound via the WoW keybinding interface (Key Bindings => Addons => PvPAudit).
 
 ## TODOs
-* investigate/fix erroneous zero CRs in arenas
 * add option to output to /instance
 * include number of honorable kills
