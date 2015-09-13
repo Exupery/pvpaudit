@@ -2,7 +2,7 @@
 ## Title: PvPAudit
 ## Notes: Displays a player's PvP experience and CR
 ## Author: Exupery - Tichondrius
-## Version: 1.0
+## Version: 1.0.1
 ## SavedVariables: PvPAuditPlayerCache
 
 PvPAudit.lua
