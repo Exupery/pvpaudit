@@ -132,6 +132,7 @@ local function printRatings()
     local highest
     if b ~= "RBG" then
       highest = GetComparisonStatistic(statistics[b])
+      if tonumber(highest) == 1500 then highest = "< 1500" end
     else
       highest = getRbgHighest()
     end

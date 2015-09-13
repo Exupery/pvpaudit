@@ -3,6 +3,7 @@ PVPAUDIT CHANGE LOG
 
 v1.0.1
 - fixed a bug where a character with a non-zero current rating in a bracket would sometimes display zero
+- show a highest rating of `1500` as `< 1500` (during the first five arena seasons players started at 1500)
 
 v1.0
 - initial release
