@@ -58,7 +58,6 @@ local function errorPrint(err)
 end
 
 local function init()
-  attempts = attempts + 1
   ClearAchievementComparisonUnit()
   ClearInspectPlayer()
 end
@@ -66,6 +65,7 @@ end
 local function audit()
   init()
 
+  local resetAttempts = false
   local canInspect = CanInspect(TARGET, false)
 
   if canInspect then
@@ -75,9 +75,15 @@ local function audit()
       NotifyInspect(TARGET)
     else
       errorPrint("Out of range")
+      resetAttempts = true
     end
   else
     errorPrint("Unable to audit")
+    resetAttempts = true
+  end
+
+  if resetAttempts then
+    attempts = 0
   end
 end
 
@@ -116,6 +122,7 @@ end
 -- INSPECT_HONOR_UPDATE may fire before CR data is actually available
 -- if CRs for all brackets are zero then rescan up to MAX_ATTEMPTS
 local function shouldRescan()
+  attempts = attempts + 1
   if attempts > MAX_ATTEMPTS then
     return false
   end
