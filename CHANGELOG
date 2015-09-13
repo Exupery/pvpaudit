@@ -1,5 +1,8 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v1.0.1
+- fixed a bug where a character with a non-zero current rating in a bracket would sometimes display zero
+
 v1.0
 - initial release

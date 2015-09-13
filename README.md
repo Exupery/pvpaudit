@@ -5,9 +5,13 @@ PvPAudit makes it easy to quickly gauge the PvP experience of another player. Si
 Please note Blizzard requires some proximity to collect the necessary data so running `/pvpaudit` on a player a great distance away will result in an **OUT OF RANGE** error, an otherwise invalid target (e.g. a member of the opossing faction) will result in an **UNABLE TO AUDIT** message.
 
 ## Output
-* Highest rating ever reached for each arena bracket and RBGs (the exact highest rating can only be obtained for arenas, for RBGs the highest achievement earned is used)
-* Current rating for each arena bracket and RBGs (this will occasionally show zero even when the player has non-zero CR when ran inside an arena, see **TODOs**)
-* Notable PvP achievements (e.g. Gladiator, Arena Master)
+* Highest rating ever reached for each arena bracket and RBGs.
+* Current rating for each arena bracket and RBGs.
+* Notable PvP achievements (e.g. Gladiator, Arena Master).
+
+## Caveats
+* The exact highest rating can only be obtained for arenas, for RBGs the highest achievement earned is used.
+* WoW's compare achievements functionality (used for determining what achievements the target has earned) returns achievements a player has earned on any character on that account by default, not just that specific character (players can toggle this in Interface -> Display). As a result a character's highest rating may be lower than what would seem required for an achievement.
 
 ## Commands
 * `/pvpaudit` - audit the current target

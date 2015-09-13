@@ -7,7 +7,7 @@ local eventFrame = nil
 
 local TARGET = "target"
 local BRACKETS = { "2v2", "3v3", "5v5", "RBG" }
-local DELAY = 0.35
+local MAX_ATTEMPTS = 3
 
 local achievements = {
   [1174] = "Arena Master",
@@ -42,8 +42,7 @@ local rbgRatings = {
 
 local targetCurrentRatings = {}
 
-local elapsed = 0
-local honorInspectCalled = false
+local attempts = 0
 
 local function colorPrint(msg)
   print("|cffb2b2b2" .. msg)
@@ -59,8 +58,7 @@ local function errorPrint(err)
 end
 
 local function init()
-  elapsed = 0
-  honorInspectCalled = false
+  attempts = attempts + 1
   ClearAchievementComparisonUnit()
   ClearInspectPlayer()
 end
@@ -115,6 +113,20 @@ local function getRbgHighest()
   end
 end
 
+-- INSPECT_HONOR_UPDATE may fire before CR data is actually available
+-- if CRs for all brackets are zero then rescan up to MAX_ATTEMPTS
+local function shouldRescan()
+  if attempts > MAX_ATTEMPTS then
+    return false
+  end
+
+  for _, r in pairs(targetCurrentRatings) do
+    if r > 0 then return false end
+  end
+
+  return true
+end
+
 local function printRatings()
   for _, b in pairs(BRACKETS) do
     local highest
@@ -142,10 +154,10 @@ local function printAll()
 end
 
 local function cleanup()
-  honorInspectCalled = false
   eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
   eventFrame:UnregisterEvent("INSPECT_HONOR_UPDATE")
   eventFrame:UnregisterEvent("INSPECT_READY")
+  attempts = 0
 end
 
 local function onInspectReady()
@@ -161,24 +173,17 @@ local function onHonorInspectReady()
 end
 
 local function onAchievementInspectReady()
-  printAll()
-  cleanup()
-end
-
--- use a delay because INSPECT_HONOR_UPDATE lies
-local function updateHandler(self, sinceLast)
-  elapsed = elapsed + sinceLast
-  if elapsed > DELAY then
-    honorInspectCalled = true
-    elapsed = 0
-    eventFrame:SetScript("OnUpdate", nil)
-    onHonorInspectReady()
+  if shouldRescan() then
+    audit()
+  else
+    printAll()
+    cleanup()
   end
 end
 
 local function eventHandler(self, event, unit, ...)
-  if event == "INSPECT_HONOR_UPDATE" and not honorInspectCalled then
-    eventFrame:SetScript("OnUpdate", updateHandler)
+  if event == "INSPECT_HONOR_UPDATE" then
+    onHonorInspectReady()
   elseif event == "INSPECT_ACHIEVEMENT_READY" then
     onAchievementInspectReady()
   elseif event == "INSPECT_READY" then
