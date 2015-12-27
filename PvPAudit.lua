@@ -297,7 +297,7 @@ local function eventHandler(self, event, unit, ...)
     onAchievementInspectReady()
   elseif event == "INSPECT_READY" then
     onInspectReady()
-  elseif event == "ADDON_LOADED" and unit == "pvpaudit" then
+  elseif event == "ADDON_LOADED" and unit == "PvPAudit" then
     addonLoaded()
     eventFrame:UnregisterEvent("ADDON_LOADED")
   end
