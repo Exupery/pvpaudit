@@ -181,9 +181,14 @@ local function printRatings(playerSlug)
 end
 
 local function printAchievements(playerSlug)
+  PvPAuditPlayerCache[playerSlug]["achievements"] = {}
+
   for k, v in pairs(achievements) do
     local completed = GetAchievementComparisonInfo(k)
-    if completed then output(v) end
+    if completed then
+      PvPAuditPlayerCache[playerSlug]["achievements"][v] = true
+      output(v)
+    end
   end
 end
 
