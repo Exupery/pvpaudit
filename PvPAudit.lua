@@ -103,11 +103,13 @@ local function audit()
   if reset then cleanup() end
 end
 
-local function printHeader()
-  local name, realm = UnitName(TARGET)
-  if realm == nil then realm = "" end
+local function printHeader(name, realm)
   local _, localeIndependentClass = UnitClass(TARGET)
   local str = string.format("PvPAudit for %s %s", name, realm)
+
+  PvPAuditPlayerCache[name .. realm]["name"] = name
+  PvPAuditPlayerCache[name .. realm]["realm"] = realm
+  PvPAuditPlayerCache[name .. realm]["localeIndependentClass"] = localeIndependentClass
 
   if printTo == nil then
     classColorPrint(str, localeIndependentClass)
@@ -180,7 +182,12 @@ local function printAchievements()
 end
 
 local function printAll()
-  printHeader()
+  local name, realm = UnitName(TARGET)
+  if realm == nil then realm = "" end
+
+  PvPAuditPlayerCache[name .. realm] = {}
+
+  printHeader(name, realm)
   printRatings()
   printAchievements()
 end
@@ -219,6 +226,10 @@ end
 local function onLoad()
   eventFrame = CreateFrame("Frame", "PvPAuditEventFrame", UIParent)
   eventFrame:SetScript("OnEvent", eventHandler)
+
+  if not PvPAuditPlayerCache then
+    PvPAuditPlayerCache = {}
+  end
 
   print("PvPAudit loaded, to audit the current target type /pvpaudit")
 end
