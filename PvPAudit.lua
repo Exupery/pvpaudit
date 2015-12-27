@@ -8,6 +8,7 @@ local eventFrame = nil
 local TARGET = "target"
 local BRACKETS = { "2v2", "3v3", "5v5", "RBG" }
 local MAX_ATTEMPTS = 3
+local MAX_CACHE_AGE = 1296000 -- 14 DAYS
 
 local achievements = {
   [1174] = "Arena Master",
@@ -270,6 +271,25 @@ local function onAchievementInspectReady()
   end
 end
 
+local function tidyCache()
+  for slug, data in pairs(PvPAuditPlayerCache) do
+    local age = time() - data["cachedAt"]
+    if age > MAX_CACHE_AGE then
+      PvPAuditPlayerCache[slug] = nil
+    end
+  end
+end
+
+local function addonLoaded()
+  if not PvPAuditPlayerCache then
+    PvPAuditPlayerCache = {}
+  else
+    tidyCache()
+  end
+
+  print("PvPAudit loaded, to audit the current target type /pvpaudit")
+end
+
 local function eventHandler(self, event, unit, ...)
   if event == "INSPECT_HONOR_UPDATE" then
     onHonorInspectReady()
@@ -277,18 +297,16 @@ local function eventHandler(self, event, unit, ...)
     onAchievementInspectReady()
   elseif event == "INSPECT_READY" then
     onInspectReady()
+  elseif event == "ADDON_LOADED" and unit == "pvpaudit" then
+    addonLoaded()
+    eventFrame:UnregisterEvent("ADDON_LOADED")
   end
 end
 
 local function onLoad()
   eventFrame = CreateFrame("Frame", "PvPAuditEventFrame", UIParent)
+  eventFrame:RegisterEvent("ADDON_LOADED")
   eventFrame:SetScript("OnEvent", eventHandler)
-
-  if not PvPAuditPlayerCache then
-    PvPAuditPlayerCache = {}
-  end
-
-  print("PvPAudit loaded, to audit the current target type /pvpaudit")
 end
 
 local function printHelp()
