@@ -68,6 +68,49 @@ local function output(msg)
 
 end
 
+local function printPlayerInfo(playerSlug)
+  local name = PvPAuditPlayerCache[playerSlug]["name"]
+  local realm = PvPAuditPlayerCache[playerSlug]["realm"]
+  local str = string.format("PvPAudit for %s %s", name, realm)
+
+  if printTo == nil then
+    classColorPrint(str, PvPAuditPlayerCache[playerSlug]["localeIndependentClass"])
+  else
+    output(str)
+  end
+end
+
+local function printRatings(playerSlug)
+  for _, b in pairs(BRACKETS) do
+    local highest = PvPAuditPlayerCache[playerSlug][b]["highest"]
+    local cr = PvPAuditPlayerCache[playerSlug][b]["cr"]
+
+    local str = b .. "   " .. highest .. " EXP "
+    if printTo == nil then str = str .. "|cffb2b2b2" end
+    str = str .. "[" .. cr .. " CR]"
+
+    output(str)
+  end
+end
+
+local function printAchievements(playerSlug)
+  local playerAchievements = PvPAuditPlayerCache[playerSlug]["achievements"]
+
+  if next(playerAchievements) ~= nil then
+    output("Notable Achievements [account-wide]")
+    for k, _ in pairs(playerAchievements) do
+      output(k)
+    end
+  end
+
+end
+
+local function printAll()
+  printPlayerInfo(playerSlug)
+  printRatings(playerSlug)
+  printAchievements(playerSlug)
+end
+
 local function init()
   ClearAchievementComparisonUnit()
   ClearInspectPlayer()
@@ -103,19 +146,13 @@ local function audit()
   if reset then cleanup() end
 end
 
-local function printHeader(name, realm)
+local function cachePlayerInfo(name, realm)
+  local playerSlug = name .. realm
   local _, localeIndependentClass = UnitClass(TARGET)
-  local str = string.format("PvPAudit for %s %s", name, realm)
 
-  PvPAuditPlayerCache[name .. realm]["name"] = name
-  PvPAuditPlayerCache[name .. realm]["realm"] = realm
-  PvPAuditPlayerCache[name .. realm]["localeIndependentClass"] = localeIndependentClass
-
-  if printTo == nil then
-    classColorPrint(str, localeIndependentClass)
-  else
-    output(str)
-  end
+  PvPAuditPlayerCache[playerSlug]["name"] = name
+  PvPAuditPlayerCache[playerSlug]["realm"] = realm
+  PvPAuditPlayerCache[playerSlug]["localeIndependentClass"] = localeIndependentClass
 end
 
 local function getCurrentRatings()
@@ -156,7 +193,7 @@ local function shouldRescan()
   return true
 end
 
-local function printRatings(playerSlug)
+local function cacheRatings(playerSlug)
   for _, b in pairs(BRACKETS) do
     local highest
     if b ~= "RBG" then
@@ -171,37 +208,30 @@ local function printRatings(playerSlug)
     PvPAuditPlayerCache[playerSlug][b] = {}
     PvPAuditPlayerCache[playerSlug][b]["highest"] = highest
     PvPAuditPlayerCache[playerSlug][b]["cr"] = cr
-
-    local str = b .. "   " .. highest .. " EXP "
-    if printTo == nil then str = str .. "|cffb2b2b2" end
-    str = str .. "[" .. cr .. " CR]"
-
-    output(str)
   end
 end
 
-local function printAchievements(playerSlug)
+local function cacheAchievements(playerSlug)
   PvPAuditPlayerCache[playerSlug]["achievements"] = {}
 
   for k, v in pairs(achievements) do
     local completed = GetAchievementComparisonInfo(k)
     if completed then
       PvPAuditPlayerCache[playerSlug]["achievements"][v] = true
-      output(v)
     end
   end
 end
 
-local function printAll()
+local function cacheAll()
   local name, realm = UnitName(TARGET)
   if realm == nil then realm = "" end
   playerSlug = name .. realm
 
   PvPAuditPlayerCache[playerSlug] = {}
 
-  printHeader(name, realm)
-  printRatings(playerSlug)
-  printAchievements(playerSlug)
+  cachePlayerInfo(name, realm)
+  cacheRatings(playerSlug)
+  cacheAchievements(playerSlug)
 end
 
 local function onInspectReady()
@@ -220,6 +250,7 @@ local function onAchievementInspectReady()
   if shouldRescan() then
     audit()
   else
+    cacheAll()
     printAll()
     cleanup()
   end
