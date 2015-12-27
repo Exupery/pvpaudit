@@ -2,7 +2,7 @@
 ### World of Warcraft PvP addon
 PvPAudit makes it easy to quickly gauge the PvP experience of another player. Simply target another player and run `/pvpaudit` to see the current rating and experience for each arena bracket and rated battlegrounds. The default command outputs this so it is only visible to you but there are options to output to various chat channels.
 
-Please note Blizzard requires some proximity to collect the necessary data so running `/pvpaudit` on a player a great distance away will result in an **OUT OF RANGE** error, an otherwise invalid target (e.g. a member of the opossing faction) will result in an **UNABLE TO AUDIT** message.
+Please note Blizzard requires some proximity to collect the necessary data so running `/pvpaudit` on a player a great distance away will result in an **OUT OF RANGE** error, an otherwise invalid target (e.g. a member of the opposing faction) will result in an **UNABLE TO AUDIT** message. The data is cached so if you attempt to audit a player you had previously (successfully) audited but is currently out of range it will display the cached results (as well as the age of the results).
 
 ## Output
 * Highest rating ever reached for each arena bracket and RBGs.

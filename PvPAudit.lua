@@ -105,7 +105,7 @@ local function printAchievements(playerSlug)
 
 end
 
-local function printAll()
+local function printAll(playerSlug)
   printPlayerInfo(playerSlug)
   printRatings(playerSlug)
   printAchievements(playerSlug)
@@ -124,6 +124,14 @@ local function cleanup()
   printTo = nil
 end
 
+local function getNameRealmSlug()
+  local name, realm = UnitName(TARGET)
+  if realm == nil then realm = "" end
+  local slug = name .. realm
+
+  return  name, realm, slug
+end
+
 local function audit()
   init()
 
@@ -137,7 +145,14 @@ local function audit()
       eventFrame:RegisterEvent("INSPECT_READY")
       NotifyInspect(TARGET)
     else
-      errorPrint("Out of range")
+      local _, _, slug = getNameRealmSlug()
+      if PvPAuditPlayerCache[slug] ~= nil then
+        local elapsed = SecondsToTime(time() - PvPAuditPlayerCache[slug]["cachedAt"])
+        output("Target out of range, using cached data from " .. elapsed .. " ago")
+        printAll(slug)
+      else
+        errorPrint("Out of range")
+      end
     end
   else
     errorPrint("Unable to audit")
@@ -153,6 +168,7 @@ local function cachePlayerInfo(name, realm)
   PvPAuditPlayerCache[playerSlug]["name"] = name
   PvPAuditPlayerCache[playerSlug]["realm"] = realm
   PvPAuditPlayerCache[playerSlug]["localeIndependentClass"] = localeIndependentClass
+  PvPAuditPlayerCache[playerSlug]["cachedAt"] = time()
 end
 
 local function getCurrentRatings()
@@ -222,16 +238,12 @@ local function cacheAchievements(playerSlug)
   end
 end
 
-local function cacheAll()
-  local name, realm = UnitName(TARGET)
-  if realm == nil then realm = "" end
-  playerSlug = name .. realm
-
-  PvPAuditPlayerCache[playerSlug] = {}
+local function cacheAll(name, realm, slug)
+  PvPAuditPlayerCache[slug] = {}
 
   cachePlayerInfo(name, realm)
-  cacheRatings(playerSlug)
-  cacheAchievements(playerSlug)
+  cacheRatings(slug)
+  cacheAchievements(slug)
 end
 
 local function onInspectReady()
@@ -250,8 +262,10 @@ local function onAchievementInspectReady()
   if shouldRescan() then
     audit()
   else
-    cacheAll()
-    printAll()
+    local name, realm, slug = getNameRealmSlug()
+
+    cacheAll(name, realm, slug)
+    printAll(slug)
     cleanup()
   end
 end

@@ -1,6 +1,9 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v1.1.1
+- output cached results of previously audited players when out of range
+
 v1.1
 - added commands for outputting to instance, party, or raid channels
 
