@@ -156,7 +156,7 @@ local function shouldRescan()
   return true
 end
 
-local function printRatings()
+local function printRatings(playerSlug)
   for _, b in pairs(BRACKETS) do
     local highest
     if b ~= "RBG" then
@@ -166,15 +166,21 @@ local function printRatings()
       highest = getRbgHighest()
     end
 
+    local cr = targetCurrentRatings[b]
+
+    PvPAuditPlayerCache[playerSlug][b] = {}
+    PvPAuditPlayerCache[playerSlug][b]["highest"] = highest
+    PvPAuditPlayerCache[playerSlug][b]["cr"] = cr
+
     local str = b .. "   " .. highest .. " EXP "
     if printTo == nil then str = str .. "|cffb2b2b2" end
-    str = str .. "[" .. targetCurrentRatings[b] .. " CR]"
+    str = str .. "[" .. cr .. " CR]"
 
     output(str)
   end
 end
 
-local function printAchievements()
+local function printAchievements(playerSlug)
   for k, v in pairs(achievements) do
     local completed = GetAchievementComparisonInfo(k)
     if completed then output(v) end
@@ -184,12 +190,13 @@ end
 local function printAll()
   local name, realm = UnitName(TARGET)
   if realm == nil then realm = "" end
+  playerSlug = name .. realm
 
-  PvPAuditPlayerCache[name .. realm] = {}
+  PvPAuditPlayerCache[playerSlug] = {}
 
   printHeader(name, realm)
-  printRatings()
-  printAchievements()
+  printRatings(playerSlug)
+  printAchievements(playerSlug)
 end
 
 local function onInspectReady()
