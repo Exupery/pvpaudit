@@ -1,6 +1,9 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v1.1.2
+- updated interface version for 7.0
+
 v1.1.1
 - output cached results of previously audited players when out of range
 
