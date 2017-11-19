@@ -24,4 +24,3 @@ Commands can be ran with `/pa` instead of `/pvpaudit` - unless another addon is 
 
 ## TODOs
 * add option to output all members of party/raid for a given bracket
-* add option to include number of honorable kills
