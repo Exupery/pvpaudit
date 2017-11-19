@@ -1,6 +1,9 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v1.2
+- increased cache age to 30 days
+
 v1.1.5
 - updated interface version for 7.3
 

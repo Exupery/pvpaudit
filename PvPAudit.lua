@@ -8,7 +8,7 @@ local eventFrame = nil
 local TARGET = "target"
 local BRACKETS = { "2v2", "3v3", "5v5", "RBG" }
 local MAX_ATTEMPTS = 3
-local MAX_CACHE_AGE = 1296000 -- 14 DAYS
+local MAX_CACHE_AGE = 2592000 -- 30 DAYS
 
 local achievements = {
   [1174] = "Arena Master",

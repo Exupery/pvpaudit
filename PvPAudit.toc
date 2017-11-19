@@ -2,7 +2,7 @@
 ## Title: PvPAudit
 ## Notes: Displays a player's PvP experience and CR
 ## Author: Exupery - Emerald Dream
-## Version: 1.1.5
+## Version: 1.2
 ## SavedVariables: PvPAuditPlayerCache
 
 PvPAudit.lua
