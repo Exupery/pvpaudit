@@ -2,6 +2,7 @@ PVPAUDIT CHANGE LOG
 ===================
 
 v1.2
+- added option to audit all group members for a specific bracket
 - increased cache age to 30 days
 
 v1.1.5

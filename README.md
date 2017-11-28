@@ -12,6 +12,7 @@ Please note Blizzard requires some proximity to collect the necessary data so ru
 ## Caveats
 * The exact highest rating can only be obtained for arenas, for RBGs the highest achievement earned is used.
 * WoW's compare achievements functionality (used for determining what achievements the target has earned) returns achievements a player has earned on any character on that account by default, not just that specific character (players can toggle this in Interface => Display). As a result a character's highest rating may be lower than what would seem required for an achievement.
+* WoW's API for getting arena info often has a short (about a second) delay, this is only slightly noticeable when auditing a single target but more pronounced if doing a group audit on a large raid
 
 ## Commands
 * `/pvpaudit` - audit the current target
@@ -20,7 +21,7 @@ Please note Blizzard requires some proximity to collect the necessary data so ru
 * `/pvpaudit r` or `/pvpaudit raid` - audit the current target and output to /raid
 * `/pvpaudit ?` or `/pvpaudit help` - print the command list
 
-Commands can be ran with `/pa` instead of `/pvpaudit` - unless another addon is in use that registers `/pa` (in which case the longer option should be used). Additionally, auditing the current target can be keybound via the WoW keybinding interface (Key Bindings => Addons => PvPAudit).
+To audit **all** current group members for a specific bracket append the bracket after any of the above audit commands. Arena brackets can be provided by either single (e.g. `3`) or three character identifiers (e.g. `3v3`)
+Examples: `/pvpaudit 3v3`, `/pvpaudit i 2`, `/pvpaudit raid rbg`
 
-## TODOs
-* add option to output all members of party/raid for a given bracket
+Commands can be ran with `/pa` instead of `/pvpaudit` - unless another addon is in use that registers `/pa` (in which case the longer option should be used). Additionally, auditing the current target can be keybound via the WoW keybinding interface (Key Bindings => Addons => PvPAudit).

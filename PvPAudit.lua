@@ -7,7 +7,7 @@ local eventFrame = nil
 
 local TARGET = "target"
 local BRACKETS = { "2v2", "3v3", "5v5", "RBG" }
-local MAX_ATTEMPTS = 3
+local MAX_ATTEMPTS = 2
 local MAX_CACHE_AGE = 2592000 -- 30 DAYS
 
 local achievements = {
@@ -41,11 +41,17 @@ local rbgRatings = {
   [2400] = {5343, 5356}
 }
 
+local auditTarget = TARGET
 local targetCurrentRatings = {}
 
 local attempts = 0
 
 local printTo = nil
+
+local auditBracket = nil
+local groupAuditTargets = {}
+local groupAuditsCompleted = 0
+local groupAuditTime = 0
 
 local function colorPrint(msg)
   print("|cffb2b2b2" .. msg)
@@ -66,13 +72,13 @@ local function output(msg)
   else
     SendChatMessage(msg, printTo)
   end
-
 end
 
 local function printPlayerInfo(playerSlug)
   local name = PvPAuditPlayerCache[playerSlug]["name"]
   local realm = PvPAuditPlayerCache[playerSlug]["realm"]
-  local str = string.format("PvPAudit for %s %s", name, realm)
+  local auditDesc = auditBracket == nil and "PvPAudit" or auditBracket .. " audit"
+  local str = string.format("%s for %s %s", auditDesc, name, realm)
 
   if printTo == nil then
     classColorPrint(str, PvPAuditPlayerCache[playerSlug]["localeIndependentClass"])
@@ -81,16 +87,23 @@ local function printPlayerInfo(playerSlug)
   end
 end
 
+-- Print player's ratings for a single bracket
+local function printRating(playerSlug, bracket)
+  local highest = PvPAuditPlayerCache[playerSlug][bracket]["highest"]
+  local cr = PvPAuditPlayerCache[playerSlug][bracket]["cr"]
+
+  local str = auditBracket and "" or (bracket .. "   ")
+  str = str .. highest .. " EXP "
+  if printTo == nil then str = str .. "|cffb2b2b2" end
+  str = str .. "[" .. cr .. " CR]"
+
+  output(str)
+end
+
+-- Print player's ratings for ALL brackets
 local function printRatings(playerSlug)
-  for _, b in pairs(BRACKETS) do
-    local highest = PvPAuditPlayerCache[playerSlug][b]["highest"]
-    local cr = PvPAuditPlayerCache[playerSlug][b]["cr"]
-
-    local str = b .. "   " .. highest .. " EXP "
-    if printTo == nil then str = str .. "|cffb2b2b2" end
-    str = str .. "[" .. cr .. " CR]"
-
-    output(str)
+  for _, bracket in pairs(BRACKETS) do
+    printRating(playerSlug, bracket)
   end
 end
 
@@ -106,10 +119,24 @@ local function printAchievements(playerSlug)
 
 end
 
+-- Prints ratings for ALL brackets and achievements
 local function printAll(playerSlug)
-  printPlayerInfo(playerSlug)
   printRatings(playerSlug)
   printAchievements(playerSlug)
+end
+
+-- Prints ratings for specified bracket only
+local function printBracket(playerSlug, bracket)
+  printRating(playerSlug, bracket)
+end
+
+local function printAuditResults(playerSlug)
+  printPlayerInfo(playerSlug)
+  if auditBracket == nil then
+    printAll(playerSlug)
+  else
+    printBracket(playerSlug, auditBracket)
+  end
 end
 
 local function init()
@@ -117,54 +144,82 @@ local function init()
   ClearInspectPlayer()
 end
 
-local function cleanup()
-  eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
-  eventFrame:UnregisterEvent("INSPECT_HONOR_UPDATE")
-  eventFrame:UnregisterEvent("INSPECT_READY")
+local function cleanup(auditFunction)
   attempts = 0
-  printTo = nil
+  groupAuditsCompleted = groupAuditsCompleted + 1
+  local nextTarget = groupAuditTargets[groupAuditsCompleted]
+  if nextTarget ~= nil then
+    auditFunction(nextTarget)
+  else
+    printTo = nil
+    auditTarget = TARGET
+    groupAuditTime = 0
+    groupAuditsCompleted = 0
+    groupAuditTargets = {}
+    eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
+    eventFrame:UnregisterEvent("INSPECT_HONOR_UPDATE")
+    eventFrame:UnregisterEvent("INSPECT_READY")
+  end
 end
 
 local function getNameRealmSlug()
-  local name, realm = UnitName(TARGET)
+  local name, realm = UnitName(auditTarget)
   if realm == nil then realm = "" end
   local slug = name .. realm
 
   return  name, realm, slug
 end
 
-local function audit()
+local function audit(target)
+  auditTarget = target
   init()
 
   local reset = true
-  local canInspect = CanInspect(TARGET, false)
+  local canInspect = CanInspect(auditTarget, false)
 
   if canInspect then
-    local inRange = UnitIsVisible(TARGET) or CheckInteractDistance(TARGET, 1)
+    local name = UnitName(auditTarget)
+    local inRange = UnitIsVisible(auditTarget) or CheckInteractDistance(auditTarget, 1)
     if inRange then
       reset = false
       eventFrame:RegisterEvent("INSPECT_READY")
-      NotifyInspect(TARGET)
+      NotifyInspect(auditTarget)
     else
       local _, _, slug = getNameRealmSlug()
       if PvPAuditPlayerCache[slug] ~= nil then
         local elapsed = SecondsToTime(time() - PvPAuditPlayerCache[slug]["cachedAt"])
-        output("Target out of range, using cached data from " .. elapsed .. " ago")
-        printAll(slug)
+        output(name .. " out of range, using cached data from " .. elapsed .. " ago")
+        printAuditResults(slug)
       else
-        errorPrint("Out of range")
+        errorPrint(name .. " out of range")
       end
     end
   else
     errorPrint("Unable to audit")
   end
 
-  if reset then cleanup() end
+  if reset then cleanup(audit) end
+end
+
+local function auditGroup()
+  local groupSize = GetNumGroupMembers()
+  if not IsInRaid() then groupSize = groupSize - 1 end
+  local group = IsInRaid() and "raid" or "party"
+  for i = 1, groupSize do
+    groupAuditTargets[i] = group .. i
+  end
+
+  if IsInRaid() then
+    groupAuditsCompleted = 1
+    audit(groupAuditTargets[1])
+  else
+    audit("player")
+  end
 end
 
 local function cachePlayerInfo(name, realm)
   local playerSlug = name .. realm
-  local _, localeIndependentClass = UnitClass(TARGET)
+  local _, localeIndependentClass = UnitClass(auditTarget)
 
   PvPAuditPlayerCache[playerSlug]["name"] = name
   PvPAuditPlayerCache[playerSlug]["realm"] = realm
@@ -199,7 +254,7 @@ end
 -- if CRs for all brackets are zero then rescan up to MAX_ATTEMPTS
 local function shouldRescan()
   attempts = attempts + 1
-  if attempts > MAX_ATTEMPTS then
+  if attempts >= MAX_ATTEMPTS then
     return false
   end
 
@@ -208,6 +263,17 @@ local function shouldRescan()
   end
 
   return true
+end
+
+local function onUpdate(self, elapsed)
+  if auditTarget ~= TARGET and groupAuditsCompleted < GetNumGroupMembers() then
+    groupAuditTime = groupAuditTime + elapsed
+    if groupAuditTime >= 1 then
+      attempts = 0
+      groupAuditTime = 0
+      audit(auditTarget)
+    end
+  end
 end
 
 local function cacheRatings(playerSlug)
@@ -255,25 +321,25 @@ end
 local function onHonorInspectReady()
   getCurrentRatings()
 
-  eventFrame:RegisterEvent("INSPECT_ACHIEVEMENT_READY")
-  SetAchievementComparisonUnit(TARGET)
+  if shouldRescan() then
+    audit(auditTarget)
+  else
+    eventFrame:RegisterEvent("INSPECT_ACHIEVEMENT_READY")
+    SetAchievementComparisonUnit(auditTarget)
+  end
 end
 
 local function onAchievementInspectReady()
-  if shouldRescan() then
-    audit()
-  else
-    local name, realm, slug = getNameRealmSlug()
+  local name, realm, slug = getNameRealmSlug()
 
-    cacheAll(name, realm, slug)
-    printAll(slug)
-    cleanup()
-  end
+  cacheAll(name, realm, slug)
+  printAuditResults(slug)
+  cleanup(audit)
 end
 
 local function tidyCache()
   for slug, data in pairs(PvPAuditPlayerCache) do
-    local age = time() - data["cachedAt"]
+    local age = time() - (data["cachedAt"] ~= nil and data["cachedAt"] or 0)
     if age > MAX_CACHE_AGE then
       PvPAuditPlayerCache[slug] = nil
     end
@@ -307,6 +373,7 @@ local function onLoad()
   eventFrame = CreateFrame("Frame", "PvPAuditEventFrame", UIParent)
   eventFrame:RegisterEvent("ADDON_LOADED")
   eventFrame:SetScript("OnEvent", eventHandler)
+  eventFrame:SetScript("OnUpdate", onUpdate)
 end
 
 local function printHelp()
@@ -315,29 +382,49 @@ local function printHelp()
   print("/pvpaudit i or /pvpaudit instance - audit the current target and output to /instance")
   print("/pvpaudit p or /pvpaudit party - audit the current target and output to /party")
   print("/pvpaudit r or /pvpaudit raid - audit the current target and output to /raid")
+  print("To audit ALL current group members and output a specific bracket append the bracket after any of the above commands.")
+  print("Arena brackets can be provided by either single (e.g. '3') or three character identifiers (e.g. '3v3')")
+  print("Examples: /pvpaudit 3v3, /pvpaudit i 2, /pvpaudit raid rbg")
   print("/pvpaudit ? or /pvpaudit help - Print this list")
 end
 
--- global function for keybinding
+-- global function for keybinding audit current target
 function pvpaudit()
-  audit()
+  auditBracket = nil
+  audit(TARGET)
 end
 
 SlashCmdList["PVPAUDIT"] = function(arg)
   if arg == "?" or arg == "help" then
     printHelp()
   else
-    if arg == "i" or arg == "instance" then
+    if string.match(arg, "i.*") then
       printTo = "INSTANCE_CHAT"
-    elseif arg == "p" or arg == "party" then
+    elseif string.match(arg, "p.*") then
       printTo = "PARTY"
-    elseif arg == "r" or arg == "raid" then
+    elseif string.match(arg, "r.*") then
       printTo = "RAID"
     else
       printTo = nil
     end
 
-    audit()
+    if string.match(arg, ".*2.*") then
+      auditBracket = BRACKETS[1]
+    elseif string.match(arg, ".*3.*") then
+      auditBracket = BRACKETS[2]
+    elseif string.match(arg, ".*5.*") then
+      auditBracket = BRACKETS[3]
+    elseif (string.match(arg, ".*rbg.*") or string.match(arg, ".*RBG.*")) then
+      auditBracket = BRACKETS[4]
+    else
+      auditBracket = nil
+    end
+
+    if auditBracket == nil then
+      audit(TARGET)
+    else
+      auditGroup()
+    end
   end
 end
 
