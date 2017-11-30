@@ -365,7 +365,6 @@ local function eventHandler(self, event, unit, ...)
     onInspectReady()
   elseif event == "ADDON_LOADED" and unit == "PvPAudit" then
     addonLoaded()
-    eventFrame:UnregisterEvent("ADDON_LOADED")
   end
 end
 

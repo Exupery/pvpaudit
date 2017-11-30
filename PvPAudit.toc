@@ -3,7 +3,7 @@
 ## Notes: Displays a player's PvP experience and CR
 ## Author: Exupery - Emerald Dream
 ## Version: 1.2
-## SavedVariables: PvPAuditPlayerCache
+## SavedVariables: PvPAuditPlayerCache, PvPAuditArenaHistory
 
 PvPAudit.lua
-
+ArenaHistory.lua
