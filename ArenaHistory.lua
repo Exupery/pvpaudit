@@ -5,6 +5,8 @@ local eventFrame = nil
 local arenaDb = PvPAuditArenaHistory
 local currentMatch = {}
 
+local playerName = GetUnitName("player", false)
+
 local function storeTempMetadata()
   print("storeTempMetadata") -- TODO DELME
   for b = 1, GetMaxBattlefieldID() do
@@ -31,15 +33,15 @@ local function matchFinished()
   print("NO PLAYERS YET") -- TODO DELME
   currentMatch.players = {}
   for p = 1, GetNumBattlefieldScores() do
-    local name, _, _, deaths, _, _, _, class, classToken, damageDone, healingDone, rating, _, _, _, talentSpec = GetBattlefieldScore(p)
-    currentMatch.players[p] = {}
-    currentMatch.players[p].name = name
-    currentMatch.players[p].died = deaths > 0
-    -- currentMatch.players[p].class = TODO
-    -- currentMatch.players[p].spec = TODO
-    currentMatch.players[p].damage = damageDone
-    currentMatch.players[p].healing = healingDone
-    currentMatch.players[p].rating = rating
+    local name, _, _, deaths, _, team, _, class, classToken, damageDone, healingDone, rating, _, _, _, talentSpec = GetBattlefieldScore(p)
+    currentMatch.players[name] = {}
+    -- currentMatch.players[name].class = TODO
+    -- currentMatch.players[name].spec = TODO
+    currentMatch.players[name].damage = damageDone
+    currentMatch.players[name].healing = healingDone
+    currentMatch.players[name].died = deaths > 0
+    currentMatch.players[name].team = team
+    currentMatch.players[name].rating = rating
     print(name) -- TODO DELME
     print(class) -- TODO DELME
     print(classToken) -- TODO DELME
@@ -55,6 +57,8 @@ local function matchFinished()
       print(teamRating) -- TODO DELME
     end
   end
+
+  currentMatch.winner = GetBattlefieldWinner()
   print(GetBattlefieldWinner()) -- TODO DELME
 end
 
