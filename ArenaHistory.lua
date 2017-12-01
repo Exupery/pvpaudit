@@ -2,12 +2,31 @@ local GREEN_TEAM = 0
 local GOLD_TEAM = 1
 
 local SPEC_ID_MAP = {}
+local WIN_LOSS_MAP = { w=0, l=0 }
 
 local eventFrame = nil
-local arenaDb = PvPAuditArenaHistory
+local arenaDb = nil
 local currentMatch = {}
 
 local playerName = GetUnitName("player", false)
+
+local function updateMapWL(isWin)
+  if arenaDb.maps[currentMatch.mapName] == nil then arenaDb.maps[currentMatch.mapName] = WIN_LOSS_MAP end
+  local currentMap = arenaDb.maps[currentMatch.mapName]
+  if isWin then
+    currentMap.w = currentMap.w + 1
+  else
+    currentMap.l = currentMap.l + 1
+  end
+end
+
+local function addCurrentMatchToDb()
+  arenaDb.matches[time()] = currentMatch
+  local isWin = currentMatch.playerTeam == currentMatch.winner
+  updateMapWL(isWin)
+  -- TODO arenaDb.players
+  -- TODO arenaDb.comps
+end
 
 local function storeTempMetadata()
   print("storeTempMetadata") -- TODO DELME
@@ -62,6 +81,10 @@ local function matchFinished()
 
   currentMatch.winner = GetBattlefieldWinner()
   print(GetBattlefieldWinner()) -- TODO DELME
+
+  if true then  -- TODO CHECK IF RATED
+    addCurrentMatchToDb()
+  end
 end
 
 local function populateSpecIdMap()
@@ -76,8 +99,12 @@ end
 local function addonLoaded()
   if not PvPAuditArenaHistory then
     PvPAuditArenaHistory = {}
-    arenaDb = PvPAuditArenaHistory
   end
+  arenaDb = PvPAuditArenaHistory
+  if arenaDb.matches == nil then arenaDb.matches = {} end
+  if arenaDb.players == nil then arenaDb.players = {} end
+  if arenaDb.comps == nil then arenaDb.comps = {} end
+  if arenaDb.maps == nil then arenaDb.maps = {} end
 
   populateSpecIdMap()
 end
