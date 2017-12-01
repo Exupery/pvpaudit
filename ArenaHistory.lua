@@ -1,6 +1,8 @@
 local GREEN_TEAM = 0
 local GOLD_TEAM = 1
 
+local SPEC_ID_MAP = {}
+
 local eventFrame = nil
 local arenaDb = PvPAuditArenaHistory
 local currentMatch = {}
@@ -35,17 +37,17 @@ local function matchFinished()
   for p = 1, GetNumBattlefieldScores() do
     local name, _, _, deaths, _, team, _, class, classToken, damageDone, healingDone, rating, _, _, _, talentSpec = GetBattlefieldScore(p)
     currentMatch.players[name] = {}
-    -- currentMatch.players[name].class = TODO
-    -- currentMatch.players[name].spec = TODO
+    currentMatch.players[name].class = classToken
+    currentMatch.players[name].specId = SPEC_ID_MAP[talentSpec]
     currentMatch.players[name].damage = damageDone
     currentMatch.players[name].healing = healingDone
     currentMatch.players[name].died = deaths > 0
     currentMatch.players[name].team = team
     currentMatch.players[name].rating = rating
     print(name) -- TODO DELME
-    print(class) -- TODO DELME
     print(classToken) -- TODO DELME
     print(talentSpec) -- TODO DELME
+    print(currentMatch.players[name].specId) -- TODO DELME
     print(rating) -- TODO DELME
   end
 
@@ -62,11 +64,22 @@ local function matchFinished()
   print(GetBattlefieldWinner()) -- TODO DELME
 end
 
+local function populateSpecIdMap()
+  for specId = 1, 999 do
+    local name = GetSpecializationNameForSpecID(specId)
+    if name ~= nil then
+      SPEC_ID_MAP[name] = specId
+    end
+  end
+end
+
 local function addonLoaded()
   if not PvPAuditArenaHistory then
     PvPAuditArenaHistory = {}
     arenaDb = PvPAuditArenaHistory
   end
+
+  populateSpecIdMap()
 end
 
 local function eventHandler(self, event, unit, ...)
