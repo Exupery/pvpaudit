@@ -3,6 +3,7 @@ local GOLD_TEAM = 1
 
 local SPEC_ID_MAP = {}
 local WIN_LOSS_MAP = { w=0, l=0 }
+local BRACKET_MAP = { ["2v2"]={}, ["3v3"]={} }
 
 local eventFrame = nil
 local arenaDb = nil
@@ -11,8 +12,10 @@ local currentMatch = {}
 local playerName = GetUnitName("player", false)
 
 local function updateMapWL(isWin)
-  if arenaDb.maps[currentMatch.mapName] == nil then arenaDb.maps[currentMatch.mapName] = WIN_LOSS_MAP end
-  local currentMap = arenaDb.maps[currentMatch.mapName]
+  local currentBracket = arenaDb.maps[currentMatch.bracket]
+  if currentBracket[currentMatch.mapName] == nil then currentBracket[currentMatch.mapName] = WIN_LOSS_MAP end
+
+  local currentMap = currentBracket[currentMatch.mapName]
   if isWin then
     currentMap.w = currentMap.w + 1
   else
@@ -31,18 +34,17 @@ end
 local function storeTempMetadata()
   print("storeTempMetadata") -- TODO DELME
   for b = 1, GetMaxBattlefieldID() do
-    local status, mapName, _, _, _, teamSize, rankedMatch = GetBattlefieldStatus(b)
+    local status, mapName, _, _, rankedMatch, queueType = GetBattlefieldStatus(b)
     if status == "active" then
       currentMatch.mapName = mapName
-      currentMatch.bracket = teamSize
-      currentMatch.ranked = rankedMatch -- TODO MAKE BOOLEAN
+      currentMatch.ranked = rankedMatch -- TODO CONFIRM
       currentMatch.season = GetCurrentArenaSeason()
       currentMatch.playerTeam = GetBattlefieldArenaFaction()
       print(GetCurrentArenaSeason()) -- TODO DELME
       print(GetBattlefieldArenaFaction()) -- TODO DELME
       print(mapName) -- TODO DELME
-      print(teamSize) -- TODO DELME
       print(rankedMatch) -- TODO DELME
+      print(queueType) -- TODO DELME
       return
     end
   end
@@ -79,6 +81,8 @@ local function matchFinished()
     end
   end
 
+  local teamSize = (GetNumBattlefieldScores() > 4) and 3 or 2
+  currentMatch.bracket = teamSize .. "v" .. teamSize
   currentMatch.winner = GetBattlefieldWinner()
   print(GetBattlefieldWinner()) -- TODO DELME
 
@@ -102,9 +106,9 @@ local function addonLoaded()
   end
   arenaDb = PvPAuditArenaHistory
   if arenaDb.matches == nil then arenaDb.matches = {} end
-  if arenaDb.players == nil then arenaDb.players = {} end
-  if arenaDb.comps == nil then arenaDb.comps = {} end
-  if arenaDb.maps == nil then arenaDb.maps = {} end
+  if arenaDb.players == nil then arenaDb.players = BRACKET_MAP end
+  if arenaDb.comps == nil then arenaDb.comps = BRACKET_MAP end
+  if arenaDb.maps == nil then arenaDb.maps = BRACKET_MAP end
 
   populateSpecIdMap()
 end
