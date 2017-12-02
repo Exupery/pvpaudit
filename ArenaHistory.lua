@@ -2,8 +2,6 @@ local GREEN_TEAM = 0
 local GOLD_TEAM = 1
 
 local SPEC_ID_MAP = {}
-local WIN_LOSS_MAP = { w=0, l=0 }
-local BRACKET_MAP = { ["2v2"]={}, ["3v3"]={} }
 
 local eventFrame = nil
 local arenaDb = nil
@@ -15,7 +13,7 @@ local function updateWL(isWin, arenaDbKey, currentMatchKey)
   local currentBracket = arenaDb[arenaDbKey][currentMatch.bracket]
   local bracketKey = currentMatch[currentMatchKey]
   if currentBracket[bracketKey] == nil then
-    currentBracket[bracketKey] = WIN_LOSS_MAP
+    currentBracket[bracketKey] = { w=0, l=0 }
   end
 
   local wlTable = currentBracket[bracketKey]
@@ -127,15 +125,20 @@ local function populateSpecIdMap()
   end
 end
 
+-- Checks if `arenaDb` has `key` and if not adds a table for each arena bracket
+local function checkAndSetBrackets(key)
+  if arenaDb[key] == nil then arenaDb[key] = { ["2v2"]={}, ["3v3"]={} } end
+end
+
 local function addonLoaded()
   if not PvPAuditArenaHistory then
     PvPAuditArenaHistory = {}
   end
   arenaDb = PvPAuditArenaHistory  -- TODO PER PLAYER
   if arenaDb.matches == nil then arenaDb.matches = {} end
-  if arenaDb.players == nil then arenaDb.players = BRACKET_MAP end
-  if arenaDb.comps == nil then arenaDb.comps = BRACKET_MAP end
-  if arenaDb.maps == nil then arenaDb.maps = BRACKET_MAP end
+  checkAndSetBrackets("players")
+  checkAndSetBrackets("comps")
+  checkAndSetBrackets("maps")
 
   populateSpecIdMap()
 end
