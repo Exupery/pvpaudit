@@ -134,7 +134,14 @@ local function addonLoaded()
   if not PvPAuditArenaHistory then
     PvPAuditArenaHistory = {}
   end
-  arenaDb = PvPAuditArenaHistory  -- TODO PER PLAYER
+
+  local playerAndRealm = playerName .. "-" .. (GetRealmName():gsub("%s+", ""))
+  if not PvPAuditArenaHistory[playerAndRealm] then
+    PvPAuditArenaHistory[playerAndRealm] = {}
+  end
+
+  arenaDb = PvPAuditArenaHistory[playerAndRealm]
+
   if arenaDb.matches == nil then arenaDb.matches = {} end
   checkAndSetBrackets("players")
   checkAndSetBrackets("comps")
