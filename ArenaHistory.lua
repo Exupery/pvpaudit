@@ -11,24 +11,36 @@ local currentMatch = {}
 
 local playerName = GetUnitName("player", false)
 
-local function updateMapWL(isWin)
-  local currentBracket = arenaDb.maps[currentMatch.bracket]
-  if currentBracket[currentMatch.mapName] == nil then currentBracket[currentMatch.mapName] = WIN_LOSS_MAP end
+local function updateWL(isWin, arenaDbKey, currentMatchKey)
+  local currentBracket = arenaDb[arenaDbKey][currentMatch.bracket]
+  local bracketKey = currentMatch[currentMatchKey]
+  if currentBracket[bracketKey] == nil then
+    currentBracket[bracketKey] = WIN_LOSS_MAP
+  end
 
-  local currentMap = currentBracket[currentMatch.mapName]
+  local wlTable = currentBracket[bracketKey]
   if isWin then
-    currentMap.w = currentMap.w + 1
+    wlTable.w = wlTable.w + 1
   else
-    currentMap.l = currentMap.l + 1
+    wlTable.l = wlTable.l + 1
   end
 end
 
+local function updateMapWL(isWin)
+  updateWL(isWin, "maps", "mapName")
+end
+
+local function updateCompWL(isWin)
+  updateWL(isWin, "comps", "comp")
+end
+
 local function addCurrentMatchToDb()
+  print("addCurrentMatchToDb")  -- TODO DELME
   arenaDb.matches[time()] = currentMatch
   local isWin = currentMatch.playerTeam == currentMatch.winner
   updateMapWL(isWin)
   -- TODO arenaDb.players
-  -- TODO arenaDb.comps
+  updateCompWL(isWin)
 end
 
 local function storeTempMetadata()
@@ -50,25 +62,39 @@ local function storeTempMetadata()
   end
 end
 
+local function getComp(specTable)
+  local comp = ""
+  table.sort(specTable)
+  for _, specId in ipairs(specTable) do
+    comp = comp .. specId .. "_"
+  end
+  return string.sub(comp, 1, -2)
+end
+
 local function matchFinished()
   print("matchFinished") -- TODO DELME
   if currentMatch.players ~= nil then return end
-  print("NO PLAYERS YET") -- TODO DELME
+  local teamSpecs = {}
+  local enemySpecs = {}
   currentMatch.players = {}
   for p = 1, GetNumBattlefieldScores() do
-    local name, _, _, deaths, _, team, _, class, classToken, damageDone, healingDone, rating, _, _, _, talentSpec = GetBattlefieldScore(p)
+    local name, _, _, _, _, team, _, class, classToken, damageDone, healingDone, rating, _, _, _, specName = GetBattlefieldScore(p)
+    local specId = SPEC_ID_MAP[specName]
     currentMatch.players[name] = {}
     currentMatch.players[name].class = classToken
-    currentMatch.players[name].specId = SPEC_ID_MAP[talentSpec]
+    currentMatch.players[name].specId = specId
     currentMatch.players[name].damage = damageDone
     currentMatch.players[name].healing = healingDone
-    currentMatch.players[name].died = deaths > 0
     currentMatch.players[name].team = team
     currentMatch.players[name].rating = rating
+
+    if team == currentMatch.playerTeam then
+      table.insert(teamSpecs, specId)
+    else
+      table.insert(enemySpecs, specId)
+    end
     print(name) -- TODO DELME
-    print(classToken) -- TODO DELME
-    print(talentSpec) -- TODO DELME
-    print(currentMatch.players[name].specId) -- TODO DELME
+    print(classToken .. " " .. specName .. " " .. specId) -- TODO DELME
     print(rating) -- TODO DELME
   end
 
@@ -84,7 +110,8 @@ local function matchFinished()
   local teamSize = (GetNumBattlefieldScores() > 4) and 3 or 2
   currentMatch.bracket = teamSize .. "v" .. teamSize
   currentMatch.winner = GetBattlefieldWinner()
-  print(GetBattlefieldWinner()) -- TODO DELME
+  currentMatch.comp = getComp(teamSpecs)
+  currentMatch.opposingComp = getComp(enemySpecs)
 
   if true then  -- TODO CHECK IF RATED
     addCurrentMatchToDb()
@@ -104,7 +131,7 @@ local function addonLoaded()
   if not PvPAuditArenaHistory then
     PvPAuditArenaHistory = {}
   end
-  arenaDb = PvPAuditArenaHistory
+  arenaDb = PvPAuditArenaHistory  -- TODO PER PLAYER
   if arenaDb.matches == nil then arenaDb.matches = {} end
   if arenaDb.players == nil then arenaDb.players = BRACKET_MAP end
   if arenaDb.comps == nil then arenaDb.comps = BRACKET_MAP end
