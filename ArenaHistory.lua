@@ -148,6 +148,8 @@ local function eventHandler(self, event, unit, ...)
   elseif event == "UPDATE_BATTLEFIELD_STATUS" and isArena then
     print("UPDATE_BATTLEFIELD_STATUS") -- TODO DELME
     storeTempMetadata()
+  elseif event == "ZONE_CHANGED_NEW_AREA" and not isArena then
+    currentMatch = {}
   elseif event == "ADDON_LOADED" and unit == "PvPAudit" then
     addonLoaded()
   end
@@ -156,6 +158,7 @@ end
 local function onLoad()
   eventFrame = CreateFrame("Frame", "PvPAuditHistoryEventFrame", UIParent)
   eventFrame:RegisterEvent("ADDON_LOADED")
+  eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
   eventFrame:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
   eventFrame:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
   eventFrame:SetScript("OnEvent", eventHandler)
