@@ -58,19 +58,13 @@ local function addCurrentMatchToDb()
 end
 
 local function storeTempMetadata()
-  print("storeTempMetadata") -- TODO DELME
   for b = 1, GetMaxBattlefieldID() do
-    local status, mapName, _, _, rankedMatch, queueType = GetBattlefieldStatus(b)
+    local status, mapName, _, _, _, queueType = GetBattlefieldStatus(b)
     if status == "active" then
       currentMatch.mapName = mapName
-      currentMatch.ranked = rankedMatch -- TODO CONFIRM
+      currentMatch.ranked = queueType == "ARENA"
       currentMatch.season = GetCurrentArenaSeason()
       currentMatch.playerTeam = GetBattlefieldArenaFaction()
-      print(GetCurrentArenaSeason()) -- TODO DELME
-      print(GetBattlefieldArenaFaction()) -- TODO DELME
-      print(mapName) -- TODO DELME
-      print(rankedMatch) -- TODO DELME
-      print(queueType) -- TODO DELME
       return
     end
   end
@@ -86,7 +80,6 @@ local function getComp(specTable)
 end
 
 local function matchFinished()
-  print("matchFinished") -- TODO DELME
   if currentMatch.players ~= nil then return end
   local teamSpecs = {}
   local enemySpecs = {}
@@ -107,16 +100,10 @@ local function matchFinished()
     else
       table.insert(enemySpecs, specId)
     end
-    print(name) -- TODO DELME
-    print(classToken .. " " .. specName .. " " .. specId) -- TODO DELME
-    print(rating) -- TODO DELME
   end
 
-  local _, oldTeamRating, newTeamRating, teamRating = GetBattlefieldTeamInfo(currentMatch.playerTeam)
-  print(oldTeamRating) -- TODO DELME
-  print(newTeamRating) -- TODO DELME
-  print(teamRating) -- TODO DELME
-  currentMatch.mmr = teamRating -- TODO CONFIRM THIS REPRESENTS MMR
+  local _, _, _, teamMmr = GetBattlefieldTeamInfo(currentMatch.playerTeam)
+  currentMatch.mmr = teamMmr
 
   local teamSize = (GetNumBattlefieldScores() > 4) and 3 or 2
   currentMatch.bracket = teamSize .. "v" .. teamSize
@@ -125,7 +112,7 @@ local function matchFinished()
   currentMatch.comp = getComp(teamSpecs)
   currentMatch.opposingComp = getComp(enemySpecs)
 
-  if true then  -- TODO CHECK IF RATED
+  if currentMatch.ranked then
     addCurrentMatchToDb()
   end
 end
