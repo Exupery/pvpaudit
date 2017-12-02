@@ -1,6 +1,3 @@
-local GREEN_TEAM = 0
-local GOLD_TEAM = 1
-
 local SPEC_ID_MAP = {}
 
 local eventFrame = nil
@@ -9,6 +6,14 @@ local currentMatch = {}
 
 local playerName = GetUnitName("player", false)
 
+local function updateWinLossCount(isWin, wlTable)
+  if isWin then
+    wlTable.w = wlTable.w + 1
+  else
+    wlTable.l = wlTable.l + 1
+  end
+end
+
 local function updateWL(isWin, arenaDbKey, currentMatchKey)
   local currentBracket = arenaDb[arenaDbKey][currentMatch.bracket]
   local bracketKey = currentMatch[currentMatchKey]
@@ -16,12 +21,7 @@ local function updateWL(isWin, arenaDbKey, currentMatchKey)
     currentBracket[bracketKey] = { w=0, l=0 }
   end
 
-  local wlTable = currentBracket[bracketKey]
-  if isWin then
-    wlTable.w = wlTable.w + 1
-  else
-    wlTable.l = wlTable.l + 1
-  end
+  updateWinLossCount(isWin, currentBracket[bracketKey])
 end
 
 local function updateMapWL(isWin)
@@ -32,13 +32,29 @@ local function updateCompWL(isWin)
   updateWL(isWin, "comps", "comp")
 end
 
+local function updatePlayers(isWin)
+  local currentBracket = arenaDb["players"][currentMatch.bracket]
+  for name, player in pairs(currentMatch.players) do
+    if name ~= playerName and currentMatch.playerTeam == player.team then
+      if currentBracket[name] == nil then
+        currentBracket[name] = { w=0, l=0, lowMmr=9999, hiMmr=0 }
+      end
+
+      local pTable = currentBracket[name]
+      local mmr = currentMatch.mmr
+      if mmr < pTable.lowMmr then pTable.lowMmr = mmr end
+      if mmr > pTable.hiMmr then pTable.hiMmr = mmr end
+      updateWinLossCount(isWin, pTable)
+    end
+  end
+end
+
 local function addCurrentMatchToDb()
-  print("addCurrentMatchToDb")  -- TODO DELME
   arenaDb.matches[time()] = currentMatch
   local isWin = currentMatch.playerTeam == currentMatch.winner
   updateMapWL(isWin)
-  -- TODO arenaDb.players
   updateCompWL(isWin)
+  updatePlayers(isWin)
 end
 
 local function storeTempMetadata()
@@ -96,17 +112,15 @@ local function matchFinished()
     print(rating) -- TODO DELME
   end
 
-  for t = 0, 1 do
-    local _, oldTeamRating, newTeamRating, teamRating = GetBattlefieldTeamInfo(t)
-    if teamRating > 0 then
-      print(oldTeamRating) -- TODO DELME
-      print(newTeamRating) -- TODO DELME
-      print(teamRating) -- TODO DELME
-    end
-  end
+  local _, oldTeamRating, newTeamRating, teamRating = GetBattlefieldTeamInfo(currentMatch.playerTeam)
+  print(oldTeamRating) -- TODO DELME
+  print(newTeamRating) -- TODO DELME
+  print(teamRating) -- TODO DELME
+  currentMatch.mmr = teamRating -- TODO CONFIRM THIS REPRESENTS MMR
 
   local teamSize = (GetNumBattlefieldScores() > 4) and 3 or 2
   currentMatch.bracket = teamSize .. "v" .. teamSize
+
   currentMatch.winner = GetBattlefieldWinner()
   currentMatch.comp = getComp(teamSpecs)
   currentMatch.opposingComp = getComp(enemySpecs)
@@ -153,10 +167,8 @@ end
 local function eventHandler(self, event, unit, ...)
   local isArena = IsActiveBattlefieldArena()
   if event == "UPDATE_BATTLEFIELD_SCORE" and isArena and GetBattlefieldWinner() ~= nil then
-    print("UPDATE_BATTLEFIELD_SCORE") -- TODO DELME
     matchFinished()
   elseif event == "UPDATE_BATTLEFIELD_STATUS" and isArena then
-    print("UPDATE_BATTLEFIELD_STATUS") -- TODO DELME
     storeTempMetadata()
   elseif event == "ZONE_CHANGED_NEW_AREA" and not isArena then
     currentMatch = {}
