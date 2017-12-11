@@ -1,9 +1,10 @@
 ## Interface: 70300
 ## Title: PvPAudit
-## Notes: Displays a player's PvP experience and CR
+## Notes: Audits potential PvP partners
 ## Author: Exupery - Emerald Dream
-## Version: 1.2
+## Version: 2.0
 ## SavedVariables: PvPAuditPlayerCache, PvPAuditArenaHistory
 
 PvPAudit.lua
 ArenaHistory.lua
+ArenaTooltip.lua

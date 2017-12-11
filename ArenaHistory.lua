@@ -6,6 +6,10 @@ local currentMatch = {}
 
 local playerName = GetUnitName("player", false)
 
+function PvPAuditGetPlayerAndRealm()
+  return playerName .. "-" .. (GetRealmName():gsub("%s+", ""))
+end
+
 local function updateWinLossCount(isWin, wlTable)
   if isWin then
     wlTable.w = wlTable.w + 1
@@ -136,7 +140,7 @@ local function addonLoaded()
     PvPAuditArenaHistory = {}
   end
 
-  local playerAndRealm = playerName .. "-" .. (GetRealmName():gsub("%s+", ""))
+  local playerAndRealm = PvPAuditGetPlayerAndRealm()
   if not PvPAuditArenaHistory[playerAndRealm] then
     PvPAuditArenaHistory[playerAndRealm] = {}
   end
@@ -149,6 +153,8 @@ local function addonLoaded()
   checkAndSetBrackets("maps")
 
   populateSpecIdMap()
+
+  PvPAuditLoadHoverModule()
 end
 
 local function eventHandler(self, event, unit, ...)
