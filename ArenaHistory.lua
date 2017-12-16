@@ -1,3 +1,5 @@
+local GREEN_TEAM = 0
+local GOLD_TEAM = 1
 local SPEC_ID_MAP = {}
 
 local eventFrame = nil
@@ -89,7 +91,7 @@ local function matchFinished()
   local enemySpecs = {}
   currentMatch.players = {}
   for p = 1, GetNumBattlefieldScores() do
-    local name, _, _, _, _, team, _, class, classToken, damageDone, healingDone, rating, _, _, _, specName = GetBattlefieldScore(p)
+    local name, _, _, _, _, team, _, class, classToken, damageDone, healingDone, _, _, _, _, specName = GetBattlefieldScore(p)
     local specId = SPEC_ID_MAP[specName]
     currentMatch.players[name] = {}
     currentMatch.players[name].class = classToken
@@ -97,7 +99,6 @@ local function matchFinished()
     currentMatch.players[name].damage = damageDone
     currentMatch.players[name].healing = healingDone
     currentMatch.players[name].team = team
-    currentMatch.players[name].rating = rating
 
     if team == currentMatch.playerTeam then
       table.insert(teamSpecs, specId)
@@ -108,6 +109,9 @@ local function matchFinished()
 
   local _, _, _, teamMmr = GetBattlefieldTeamInfo(currentMatch.playerTeam)
   currentMatch.mmr = teamMmr
+  local opposingTeam = (currentMatch.playerTeam == GREEN_TEAM) and GOLD_TEAM or GREEN_TEAM
+  local _, _, _, opposingMmr = GetBattlefieldTeamInfo(opposingTeam)
+  currentMatch.opposingMmr = opposingMmr
 
   local teamSize = (GetNumBattlefieldScores() > 4) and 3 or 2
   currentMatch.bracket = teamSize .. "v" .. teamSize
