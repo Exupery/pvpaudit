@@ -5,6 +5,7 @@ local BRACKETS = { "2v2", "3v3" }
 
 -- adds W/L data to tooltip if DB has data for `name`
 local function addToTooltip(tooltip, name)
+  if not name then return end
   for _, bracket in pairs(BRACKETS) do
     local target = arenaDb["players"][bracket][name]
     if target then
@@ -23,13 +24,20 @@ local function tooltipOnShow(tooltip)
 
     local _, results = C_LFGList.GetSearchResults()
     for _, r in pairs(results) do
-      local id, _, name, desc, voice, _, _, _, _, _, _, _, leader = C_LFGList.GetSearchResultInfo(r)
-      if txt and txt:match(name) then
+      local id, _, groupName, desc, voice, _, _, _, _, _, _, _, leader = C_LFGList.GetSearchResultInfo(r)
+      if txt == groupName then
         addToTooltip(tooltip, leader)
       end
     end
 
-    -- TODO HANDLE PLAYER IS IN GROUP LFM
+    local applicants = C_LFGList.GetApplicants()
+    if not applicants then return end
+    for _, a in pairs(applicants) do
+      local name = C_LFGList.GetApplicantMemberInfo(a, 1)
+      if txt == name then
+        addToTooltip(tooltip, name)
+      end
+    end
   end
 end
 
