@@ -11,7 +11,7 @@ local function addToTooltip(tooltip, name)
     if target then
       local mmrRange = target.lowMmr .. "-" .. target.hiMmr
       local str = string.format("%s W: %d L: %d MMR: %s", bracket, target.w, target.l, mmrRange)
-      tooltip:AddLine(str, 1, 1, 1)
+      tooltip:AddLine(str)
       tooltip:Show()
     end
   end
