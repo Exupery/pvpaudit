@@ -37,3 +37,8 @@ To audit **all** current group members for a specific bracket append the bracket
 Examples: `/pvpaudit 3v3`, `/pvpaudit i 2`, `/pvpaudit raid rbg`
 
 Commands can be ran with `/pa` instead of `/pvpaudit` - unless another addon is in use that registers `/pa` (in which case the longer option should be used). Additionally, auditing the current target can be keybound via the WoW keybinding interface (Key Bindings => Addons => PvPAudit).
+
+## TODOS
+* add option to hide history from tooltips
+* for past arena partners allow including a note for display in tooltip along with history
+* implement a GUI showing win/loss percentage by a) partner b) comp c) enemy comp d) map
