@@ -1,6 +1,9 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v2.0
+- display win/loss record and mmr range in tooltip of past arena partners
+
 v1.2
 - added option to audit all group members for a specific bracket
 - increased cache age to 30 days
