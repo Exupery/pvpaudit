@@ -1,11 +1,13 @@
 # PvPAudit
 ### World of Warcraft PvP addon
 PvPAudit helps you find appropriate PvP partners by making it easy to quickly see:
+
 * your history with another player (arena only)
 * the PvP experience and current ratings of another player (arena and RBGs)
 
 ## Partner History
 For any player your current character has played one or more (rated) arena matches with the tooltip (both regular tooltip and the one used by the LFG tool) will display:
+
 * win/loss record with that player
 * MMR range of the games played with that player
 
