@@ -1,9 +1,10 @@
 local arenaDb = nil
 local eventFrame = nil
 
-local viewer = CreateFrame("Frame", "PvPAuditHistoryViewer", UIParent)
+local viewer = CreateFrame("Frame", "PvPAuditHistoryViewer", UIParent, "BasicFrameTemplateWithInset")
 viewer:SetClampedToScreen(true)
 viewer:SetMovable(true)
+viewer:Hide()
 
 local function showViewer()
   viewer:Show()
