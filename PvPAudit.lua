@@ -396,6 +396,8 @@ end
 SlashCmdList["PVPAUDIT"] = function(arg)
   if arg == "?" or arg == "help" then
     printHelp()
+  elseif string.match(arg, "h.*") then
+    PvPAuditHistoryCmd(arg)
   else
     if string.match(arg, "i.*") then
       printTo = "INSTANCE_CHAT"
