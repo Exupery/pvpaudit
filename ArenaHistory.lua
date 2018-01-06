@@ -159,6 +159,7 @@ local function addonLoaded()
   populateSpecIdMap()
 
   PvPAuditLoadHoverModule()
+  PvPAuditLoadViewerModule()
 end
 
 local function eventHandler(self, event, unit, ...)

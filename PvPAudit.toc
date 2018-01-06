@@ -7,4 +7,5 @@
 
 PvPAudit.lua
 ArenaHistory.lua
+ArenaHistoryViewer.lua
 ArenaTooltip.lua
