@@ -1,5 +1,5 @@
 local BRACKETS = { "2v2", "3v3" }
-local CATEGORIES = { "maps", "comps", "players" }
+local CATEGORIES = { "Maps", "Comps", "Players" }
 
 local arenaDb = nil
 local eventFrame = nil
@@ -12,6 +12,8 @@ viewer:SetAlpha(0.8)
 
 local bracketTabs = CreateFrame("Frame", "PvPAuditBracketTabs", viewer)
 local categoryTabs = CreateFrame("Frame", "PvPAuditCategoryTabs", viewer)
+local tableFrame = CreateFrame("Frame", "PvPAuditViewerTable", viewer)
+local identifierHeading = nil
 
 local function showViewer()
   viewer:Show()
@@ -26,6 +28,8 @@ end
 
 local function selectCategory(tab)
   PanelTemplates_SetTab(categoryTabs, tab:GetID())
+  local cat = CATEGORIES[tab:GetID()]
+  identifierHeading:SetText(string.sub(cat, 1, cat:len() - 1))
 end
 
 local function drawBracketTabs()
@@ -60,6 +64,27 @@ local function drawCategoryTabs()
   PanelTemplates_SetTab(categoryTabs, table.getn(CATEGORIES)) -- these tabs get drawn right to left
 end
 
+local function createColumnHeader(text, anchor, anchorPoint, widthPercent)
+  local header = tableFrame:CreateFontString(tableFrame:GetName()..text, "ARTWORK", "GameFontNormal")
+  header:SetPoint("TOPLEFT", anchor, anchorPoint, 0, 0)
+  header:SetWidth(tableFrame:GetWidth() * widthPercent)
+  header:SetJustifyH("CENTER")
+  header:SetText(text)
+  header:Show()
+  return header
+end
+
+local function drawTable()
+  tableFrame:SetPoint("BOTTOMLEFT", viewer, "BOTTOMLEFT", 10, 5)
+  tableFrame:SetWidth(viewer:GetWidth() - 15)
+  tableFrame:SetHeight(viewer:GetHeight() - 35)
+
+  identifierHeading = createColumnHeader("Identifier", tableFrame, "TOPLEFT", 0.45)
+  local wins = createColumnHeader("Wins", identifierHeading, "TOPRIGHT", 0.15)
+  local losses = createColumnHeader("Losses", wins, "TOPRIGHT", 0.15)
+  local ratio = createColumnHeader("Ratio", losses, "TOPRIGHT", 0.25)
+end
+
 local function drawMainFrame()
   if viewer:GetHeight() ~= 0 then return end
 
@@ -74,7 +99,9 @@ local function drawMainFrame()
 
   drawBracketTabs()
   drawCategoryTabs()
+  drawTable()
 
+  selectCategory(_G[categoryTabs:GetName().."Tab"..table.getn(CATEGORIES)])
   viewer:Hide()
 end
 
