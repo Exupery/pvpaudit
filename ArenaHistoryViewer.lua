@@ -13,23 +13,77 @@ viewer:SetAlpha(0.8)
 local bracketTabs = CreateFrame("Frame", "PvPAuditBracketTabs", viewer)
 local categoryTabs = CreateFrame("Frame", "PvPAuditCategoryTabs", viewer)
 local tableFrame = CreateFrame("Frame", "PvPAuditViewerTable", viewer)
+local dataBorderFrame = CreateFrame("Frame", "PvPAuditViewerTableDataBorder", tableFrame, "InsetFrameTemplate2")
+local tableScrollFrame = CreateFrame("ScrollFrame", "PvPAuditViewerScroll", dataBorderFrame, "UIPanelScrollFrameTemplate")
+local tableScrollChild = CreateFrame("Frame", "PvPAuditViewerScrollChild", tableScrollFrame)
+local tableDataFrame = CreateFrame("Frame", "PvPAuditViewerTableData", tableScrollChild)
+tableScrollFrame:SetScrollChild(tableScrollChild)
+
+local cells = {}
 local identifierHeading = nil
 
-local function showViewer()
-  viewer:Show()
+local function createCell(row, colHeader, text, anchor, anchorPoint)
+  local key = tableDataFrame:GetName()..row..colHeader
+  local cell = cells[key]
+
+  if cell == nil then
+    cell = tableDataFrame:CreateFontString(key, "ARTWORK", "GameTooltipTextSmall")
+    cell:SetPoint("TOPLEFT", anchor, anchorPoint, 0, 0)
+    cell:SetWidth(_G[tableFrame:GetName()..colHeader]:GetWidth() - 3)
+    if colHeader == "Identifier" then
+      cell:SetJustifyH("LEFT")
+    else
+      cell:SetJustifyH("RIGHT")
+    end
+    cells[key] = cell
+  end
+
+  cell:SetText(text)
+  cell:Show()
+  return cell
 end
 
-local function eventHandler(self, event, unit, ...)
+local function clearTable()
+  for _, cell in pairs(cells) do
+    cell:Hide()
+  end
+end
+
+local function populateTable()
+  clearTable()
+  local bracketId = PanelTemplates_GetSelectedTab(bracketTabs)
+  local catId = PanelTemplates_GetSelectedTab(categoryTabs)
+  if not bracketId or not catId then return end
+
+  local bracket = BRACKETS[bracketId]
+  local cat = CATEGORIES[catId]:lower()
+  local data = arenaDb[cat][bracket]
+  if not data then return end
+  local row = 1
+  local idCellAnchor = tableDataFrame
+  local idCellAnchorPoint = "TOPLEFT"
+  for k, t in pairs(data) do
+    local ratio = t.w / (t.w + t.l) * 100
+    local idCell = createCell(row, "Identifier", k, idCellAnchor, idCellAnchorPoint)
+    local wCell = createCell(row, "Wins", t.w, idCell, "TOPRIGHT")
+    local lCell = createCell(row, "Losses", t.l, wCell, "TOPRIGHT")
+    local rCell = createCell(row, "Ratio", string.format("%.1f", ratio).."%     ", lCell, "TOPRIGHT")
+    row = row + 1
+    idCellAnchor = idCell
+    idCellAnchorPoint = "BOTTOMLEFT"
+  end
 end
 
 local function selectBracket(tab)
   PanelTemplates_SetTab(bracketTabs, tab:GetID())
+  populateTable()
 end
 
 local function selectCategory(tab)
   PanelTemplates_SetTab(categoryTabs, tab:GetID())
   local cat = CATEGORIES[tab:GetID()]
   identifierHeading:SetText(string.sub(cat, 1, cat:len() - 1))
+  populateTable()
 end
 
 local function drawBracketTabs()
@@ -79,10 +133,25 @@ local function drawTable()
   tableFrame:SetWidth(viewer:GetWidth() - 15)
   tableFrame:SetHeight(viewer:GetHeight() - 35)
 
-  identifierHeading = createColumnHeader("Identifier", tableFrame, "TOPLEFT", 0.45)
+  identifierHeading = createColumnHeader("Identifier", tableFrame, "TOPLEFT", 0.5)
   local wins = createColumnHeader("Wins", identifierHeading, "TOPRIGHT", 0.15)
   local losses = createColumnHeader("Losses", wins, "TOPRIGHT", 0.15)
-  local ratio = createColumnHeader("Ratio", losses, "TOPRIGHT", 0.25)
+  local ratio = createColumnHeader("Ratio", losses, "TOPRIGHT", 0.2)
+
+  dataBorderFrame:SetPoint("BOTTOMLEFT", tableFrame, "BOTTOMLEFT", -4, -2)
+  dataBorderFrame:SetWidth(tableFrame:GetWidth() + 1)
+  dataBorderFrame:SetHeight(tableFrame:GetHeight() - identifierHeading:GetHeight() - 1)
+
+  tableScrollFrame:SetPoint("BOTTOMLEFT", dataBorderFrame, "BOTTOMLEFT", -4, 4)
+  tableScrollFrame:SetWidth(dataBorderFrame:GetWidth() - 22)
+  tableScrollFrame:SetHeight(dataBorderFrame:GetHeight() - 10)
+
+  tableScrollChild:SetHeight(tableScrollFrame:GetHeight())
+  tableScrollChild:SetWidth(tableScrollFrame:GetWidth())
+
+  tableDataFrame:SetPoint("BOTTOMLEFT", tableScrollChild, "BOTTOMLEFT", 11, 12)
+  tableDataFrame:SetWidth(tableScrollFrame:GetWidth())
+  tableDataFrame:SetHeight(tableScrollFrame:GetHeight() - 12)
 end
 
 local function drawMainFrame()
@@ -103,6 +172,14 @@ local function drawMainFrame()
 
   selectCategory(_G[categoryTabs:GetName().."Tab"..table.getn(CATEGORIES)])
   viewer:Hide()
+end
+
+local function showViewer()
+  populateTable()
+  viewer:Show()
+end
+
+local function eventHandler(self, event, unit, ...)
 end
 
 function PvPAuditLoadViewerModule()
