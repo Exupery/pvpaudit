@@ -22,6 +22,15 @@ tableScrollFrame:SetScrollChild(tableScrollChild)
 local cells = {}
 local identifierHeading = nil
 
+local function sortTableKeys(tbl)
+  local sorted = {}
+  for k, v in pairs(tbl) do
+    table.insert(sorted, k)
+  end
+  table.sort(sorted)
+  return sorted
+end
+
 local function createCell(row, colHeader, text, anchor, anchorPoint)
   local key = tableDataFrame:GetName()..row..colHeader
   local cell = cells[key]
@@ -62,7 +71,9 @@ local function populateTable()
   local row = 1
   local idCellAnchor = tableDataFrame
   local idCellAnchorPoint = "TOPLEFT"
-  for k, t in pairs(data) do
+  local sorted = sortTableKeys(data)
+  for _, k in ipairs(sorted) do
+    local t = data[k]
     local ratio = t.w / (t.w + t.l) * 100
     local idCell = createCell(row, "Identifier", k, idCellAnchor, idCellAnchorPoint)
     local wCell = createCell(row, "Wins", t.w, idCell, "TOPRIGHT")
