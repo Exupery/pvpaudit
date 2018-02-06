@@ -1,6 +1,9 @@
 local BRACKETS = { "2v2", "3v3" }
 local CATEGORIES = { "Maps", "Comps", "Players" }
 
+local IDENTIFIER = "Identifier"
+local FONT = "Fonts\\FRIZQT__.TTF"
+
 local arenaDb = nil
 local eventFrame = nil
 
@@ -39,15 +42,75 @@ local function createCell(row, colHeader, text, anchor, anchorPoint)
     cell = tableDataFrame:CreateFontString(key, "ARTWORK", "GameTooltipTextSmall")
     cell:SetPoint("TOPLEFT", anchor, anchorPoint, 0, 0)
     cell:SetWidth(_G[tableFrame:GetName()..colHeader]:GetWidth() - 3)
-    if colHeader == "Identifier" then
+    if colHeader == IDENTIFIER then
       cell:SetJustifyH("LEFT")
     else
       cell:SetJustifyH("RIGHT")
     end
+    cell:SetFont(FONT, _G[tableFrame:GetName()..IDENTIFIER]:GetHeight() * 0.75)
     cells[key] = cell
   end
 
   cell:SetText(text)
+  cell:Show()
+  return cell
+end
+
+local function specTexture(frame, specId)
+  local size = _G[tableFrame:GetName()..IDENTIFIER]:GetHeight()
+  local texture = frame:CreateTexture(nil, "ARTWORK")
+  local _, _, _, icon = GetSpecializationInfoByID(specId)
+  texture:SetTexture(icon)
+  texture:SetSize(size, size)
+  return texture
+end
+
+local function getSpecsFromComp(comp)
+  local specs = {}
+  local startIdx = 1
+  local endIdx = nil
+  for s = 1, 3 do
+    local endIdx = comp:find("_", startIdx, true)
+    if endIdx == nil then
+      endIdx = comp:len()
+    else
+      endIdx = endIdx - 1
+    end
+    local spec = comp:sub(startIdx, endIdx)
+    if spec and spec:len() > 0 then
+      table.insert(specs, spec)
+    end
+    startIdx = endIdx + 2
+  end
+  return specs
+end
+
+local function createCompCell(row, comp, anchor, anchorPoint)
+  local key = tableDataFrame:GetName()..row.."Comp"
+  local cell = cells[key]
+
+  if cell == nil then
+    cell = CreateFrame("Frame", key, anchor)
+    local width = _G[tableFrame:GetName()..IDENTIFIER]:GetWidth() - 3
+    local height = _G[tableFrame:GetName()..IDENTIFIER]:GetHeight()
+    cell:SetSize(width, height)
+    cell:SetPoint("TOPLEFT", anchor, anchorPoint, 0, 0)
+    cells[key] = cell
+  end
+
+  local specAnchor = cell
+  local specAnchorPoint = "CENTER"
+  local xOffset = -28
+  for _, specId in pairs(getSpecsFromComp(comp)) do
+    local spec = specTexture(cell, specId)
+    spec:SetPoint("LEFT", specAnchor, specAnchorPoint, xOffset, 0)
+    spec:Show()
+    specAnchor = spec
+    specAnchorPoint = "RIGHT"
+    xOffset = 2
+    cells[key..specId] = spec
+  end
+
   cell:Show()
   return cell
 end
@@ -75,7 +138,13 @@ local function populateTable()
   for _, k in ipairs(sorted) do
     local t = data[k]
     local ratio = t.w / (t.w + t.l) * 100
-    local idCell = createCell(row, "Identifier", k, idCellAnchor, idCellAnchorPoint)
+
+    local idCell = nil
+    if cat == "comps" then
+      idCell = createCompCell(row, k, idCellAnchor, idCellAnchorPoint)
+    else
+      idCell = createCell(row, IDENTIFIER, k, idCellAnchor, idCellAnchorPoint)
+    end
     local wCell = createCell(row, "Wins", t.w, idCell, "TOPRIGHT")
     local lCell = createCell(row, "Losses", t.l, wCell, "TOPRIGHT")
     local rCell = createCell(row, "Ratio", string.format("%.1f", ratio).."%     ", lCell, "TOPRIGHT")
@@ -132,6 +201,7 @@ end
 local function createColumnHeader(text, anchor, anchorPoint, widthPercent)
   local header = tableFrame:CreateFontString(tableFrame:GetName()..text, "ARTWORK", "GameFontNormal")
   header:SetPoint("TOPLEFT", anchor, anchorPoint, 0, 0)
+  header:SetHeight(18)
   header:SetWidth(tableFrame:GetWidth() * widthPercent)
   header:SetJustifyH("CENTER")
   header:SetText(text)
@@ -144,7 +214,7 @@ local function drawTable()
   tableFrame:SetWidth(viewer:GetWidth() - 15)
   tableFrame:SetHeight(viewer:GetHeight() - 35)
 
-  identifierHeading = createColumnHeader("Identifier", tableFrame, "TOPLEFT", 0.5)
+  identifierHeading = createColumnHeader(IDENTIFIER, tableFrame, "TOPLEFT", 0.5)
   local wins = createColumnHeader("Wins", identifierHeading, "TOPRIGHT", 0.15)
   local losses = createColumnHeader("Losses", wins, "TOPRIGHT", 0.15)
   local ratio = createColumnHeader("Ratio", losses, "TOPRIGHT", 0.2)
