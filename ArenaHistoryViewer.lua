@@ -42,12 +42,13 @@ local function createCell(row, colHeader, text, anchor, anchorPoint)
     cell = tableDataFrame:CreateFontString(key, "ARTWORK", "GameTooltipTextSmall")
     cell:SetPoint("TOPLEFT", anchor, anchorPoint, 0, 0)
     cell:SetWidth(_G[tableFrame:GetName()..colHeader]:GetWidth() - 3)
+    cell:SetHeight(_G[tableFrame:GetName()..IDENTIFIER]:GetHeight())
     if colHeader == IDENTIFIER then
       cell:SetJustifyH("LEFT")
     else
       cell:SetJustifyH("RIGHT")
     end
-    cell:SetFont(FONT, _G[tableFrame:GetName()..IDENTIFIER]:GetHeight() * 0.75)
+    cell:SetFont(FONT, _G[tableFrame:GetName()..IDENTIFIER]:GetHeight())
     cells[key] = cell
   end
 
@@ -57,7 +58,7 @@ local function createCell(row, colHeader, text, anchor, anchorPoint)
 end
 
 local function specTexture(frame, specId)
-  local size = _G[tableFrame:GetName()..IDENTIFIER]:GetHeight()
+  local size = _G[tableFrame:GetName()..IDENTIFIER]:GetHeight() * 0.8
   local texture = frame:CreateTexture(nil, "ARTWORK")
   local _, _, _, icon = GetSpecializationInfoByID(specId)
   texture:SetTexture(icon)
@@ -202,7 +203,7 @@ end
 local function createColumnHeader(text, anchor, anchorPoint, widthPercent)
   local header = tableFrame:CreateFontString(tableFrame:GetName()..text, "ARTWORK", "GameFontNormal")
   header:SetPoint("TOPLEFT", anchor, anchorPoint, 0, 0)
-  header:SetHeight(18)
+  header:SetHeight(19)
   header:SetWidth(tableFrame:GetWidth() * widthPercent)
   header:SetJustifyH("CENTER")
   header:SetText(text)
@@ -240,7 +241,7 @@ local function drawMainFrame()
   if viewer:GetHeight() ~= 0 then return end
 
   viewer:SetWidth(512)
-  viewer:SetHeight(256)
+  viewer:SetHeight(480)
   viewer:SetResizable(false)
 
   viewer:RegisterForDrag("LeftButton", "RightButton")
