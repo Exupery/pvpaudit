@@ -138,6 +138,7 @@ local function populateTable()
   for _, k in ipairs(sorted) do
     local t = data[k]
     local ratio = t.w / (t.w + t.l) * 100
+    if ratio < 1 then ratio = 0 end
 
     local idCell = nil
     if cat == "comps" then
