@@ -58,10 +58,10 @@ local function updatePlayers(isWin)
 end
 
 local function addCurrentMatchToDb()
-  arenaDb.matches[time()] = currentMatch
   local isWin = currentMatch.playerTeam == currentMatch.winner
   updateMapWL(isWin)
   updateCompWL(isWin)
+  -- TODO UPDATE OPPOSING COMP WL
   updatePlayers(isWin)
 end
 
@@ -133,43 +133,8 @@ local function tableSize(table)
   return count
 end
 
--- v2.0 populated the spec ID map incorrectly by using only the spec names
--- as the keys, since spec names are not unique across classes (e.g. resto,
--- holy, frost) all such spec data is invalid and requires correction.
 local function fixInvalidData()
-  if tableSize(arenaDb.matches) == 0 or tableSize(arenaDb["opposingComps"]["2v2"]) > 0 or tableSize(arenaDb["opposingComps"]["3v3"]) > 0 then
-    return
-  end
-
-  arenaDb.comps = { ["2v2"]={}, ["3v3"]={} }
-  for _, match in pairs(arenaDb.matches) do
-    local teamSpecs = {}
-    local enemySpecs = {}
-    local playerTeam = match["players"][playerName]["team"]
-    for _, player in pairs(match.players) do
-      local specName = GetSpecializationNameForSpecID(player.specId)
-      local specId = SPEC_ID_MAP[specName .. player.class]
-      player.specId = specId
-      if player.team == playerTeam then
-        table.insert(teamSpecs, specId)
-      else
-        table.insert(enemySpecs, specId)
-      end
-    end
-    match.comp = getComp(teamSpecs)
-    match.opposingComp = getComp(enemySpecs)
-    local isWin = playerTeam == match.winner
-    local bracket = match.bracket
-    if arenaDb["comps"][bracket][match.comp] == nil then
-      arenaDb["comps"][bracket][match.comp] = {}
-    end
-    if arenaDb["opposingComps"][bracket][match.opposingComp] == nil then
-      arenaDb["opposingComps"][bracket][match.opposingComp] = {}
-    end
-    updateWinLossCount(isWin, arenaDb["comps"][bracket][match.comp])
-    updateWinLossCount(isWin, arenaDb["opposingComps"][bracket][match.opposingComp])
-  end
-
+  -- TODO CLEANUP NO LONGER POSSIBLE DUE TO NOT STORING MATCH DATA, WILL RESET HERE INSTEAD
 end
 
 local function populateSpecIdMap()
