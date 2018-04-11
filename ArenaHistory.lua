@@ -40,6 +40,10 @@ local function updateCompWL(isWin)
   updateWL(isWin, "comps", "comp")
 end
 
+local function updateOpposingCompWL(isWin)
+  updateWL(isWin, "opposingComps", "opposingComp")
+end
+
 local function updatePlayers(isWin)
   local currentBracket = arenaDb["players"][currentMatch.bracket]
   for name, player in pairs(currentMatch.players) do
@@ -61,7 +65,7 @@ local function addCurrentMatchToDb()
   local isWin = currentMatch.playerTeam == currentMatch.winner
   updateMapWL(isWin)
   updateCompWL(isWin)
-  -- TODO UPDATE OPPOSING COMP WL
+  updateOpposingCompWL(isWin)
   updatePlayers(isWin)
 end
 
@@ -164,7 +168,6 @@ local function addonLoaded()
 
   arenaDb = PvPAuditArenaHistory[playerAndRealm]
 
-  if arenaDb.matches == nil then arenaDb.matches = {} end
   checkAndSetBrackets("players")
   checkAndSetBrackets("comps")
   checkAndSetBrackets("opposingComps")
