@@ -93,8 +93,8 @@ local function matchFinished()
   local enemySpecs = {}
   currentMatch.players = {}
   for p = 1, GetNumBattlefieldScores() do
-    local name, _, _, _, _, team, _, class, classToken, damageDone, healingDone, _, _, _, _, specName = GetBattlefieldScore(p)
-    local specId = SPEC_ID_MAP[specName]
+    local name, _, _, _, _, team, _, _, classToken, damageDone, healingDone, _, _, _, _, specName = GetBattlefieldScore(p)
+    local specId = SPEC_ID_MAP[specName .. classToken]
     currentMatch.players[name] = {}
     currentMatch.players[name].class = classToken
     currentMatch.players[name].specId = specId
