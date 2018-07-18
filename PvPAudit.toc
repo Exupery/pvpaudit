@@ -1,8 +1,8 @@
-## Interface: 70300
+## Interface: 80000
 ## Title: PvPAudit
 ## Notes: Audits potential PvP partners
 ## Author: Exupery - Emerald Dream
-## Version: 2.0
+## Version: 2.1
 ## SavedVariables: PvPAuditPlayerCache, PvPAuditArenaHistory
 
 PvPAudit.lua
