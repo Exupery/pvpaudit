@@ -11,6 +11,8 @@ For any player your current character has played one or more (rated) arena match
 * win/loss record with that player
 * MMR range of the games played with that player
 
+Your win/loss record with each player, comp, and map can be seen in the history viewer (`/pvpaudit history`).
+
 **Note:** if you leave the arena instance before the end-of-arena scoreboard is shown that match will **not** be included in your match history (i.e. stay until the scoreboard is displayed if you want accurate data).
 
 ## Player Audit
@@ -33,6 +35,7 @@ Please note Blizzard requires some proximity to collect the necessary data so ru
 * `/pvpaudit i` or `/pvpaudit instance` - audit the current target and output to /instance
 * `/pvpaudit p` or `/pvpaudit party` - audit the current target and output to /party
 * `/pvpaudit r` or `/pvpaudit raid` - audit the current target and output to /raid
+* `/pvpaudit h` or `/pvpaudit history` - open the arena partner/comps/maps history viewer
 * `/pvpaudit ?` or `/pvpaudit help` - print the command list
 
 To audit **all** current group members for a specific bracket append the bracket after any of the above audit commands. Arena brackets can be provided by either single (e.g. `3`) or three character identifiers (e.g. `3v3`)
@@ -43,4 +46,5 @@ Commands can be ran with `/pa` instead of `/pvpaudit` - unless another addon is 
 ## TODOS
 * add option to hide history from tooltips
 * for past arena partners allow including a note for display in tooltip along with history
-* implement a GUI showing win/loss percentage by a) partner b) comp c) enemy comp d) map
+* include opposing comps in the history viewer
+* allow clearing of player/comp/map history

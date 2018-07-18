@@ -1,6 +1,10 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v2.1
+- updated interface version for 8.0
+- implemented a GUI showing win/loss record by a) partner b) comp and c) map
+
 v2.0
 - display win/loss record and mmr range in tooltip of past arena partners
 
