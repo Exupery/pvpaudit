@@ -138,7 +138,13 @@ local function tableSize(table)
 end
 
 local function fixInvalidData()
-  -- TODO CLEANUP NO LONGER POSSIBLE DUE TO NOT STORING MATCH DATA, WILL RESET HERE INSTEAD
+  if arenaDb.matches ~= nil then
+    -- Cleanup unused stored match data from v2.0
+    arenaDb.matches = nil
+    -- Purge data stored with invalid spec map from v2.0
+    arenaDb.comps = nil
+    arenaDb.maps = nil
+  end
 end
 
 local function populateSpecIdMap()
@@ -148,7 +154,6 @@ local function populateSpecIdMap()
       SPEC_ID_MAP[name .. class] = specId
     end
   end
-  fixInvalidData()
 end
 
 -- Checks if `arenaDb` has `key` and if not adds a table for each arena bracket
@@ -168,6 +173,7 @@ local function addonLoaded()
 
   arenaDb = PvPAuditArenaHistory[playerAndRealm]
 
+  fixInvalidData()
   checkAndSetBrackets("players")
   checkAndSetBrackets("comps")
   checkAndSetBrackets("opposingComps")
