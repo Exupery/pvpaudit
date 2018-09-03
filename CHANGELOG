@@ -1,6 +1,9 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v2.2
+- fixed bug where group-wide RBG audit would output to raid, regardless of desired output destination
+
 v2.1
 - updated interface version for 8.0
 - implemented a GUI showing win/loss record by a) partner b) comp and c) map

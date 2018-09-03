@@ -403,7 +403,7 @@ SlashCmdList["PVPAUDIT"] = function(arg)
       printTo = "INSTANCE_CHAT"
     elseif string.match(arg, "p.*") then
       printTo = "PARTY"
-    elseif string.match(arg, "r.*") then
+    elseif string.match(arg, "r.*") and arg:lower() ~= "rbg" then
       printTo = "RAID"
     else
       printTo = nil
@@ -415,7 +415,7 @@ SlashCmdList["PVPAUDIT"] = function(arg)
       auditBracket = BRACKETS[2]
     elseif string.match(arg, ".*5.*") then
       auditBracket = BRACKETS[3]
-    elseif (string.match(arg, ".*rbg.*") or string.match(arg, ".*RBG.*")) then
+    elseif string.match(arg:lower(), ".*rbg.*") then
       auditBracket = BRACKETS[4]
     else
       auditBracket = nil
