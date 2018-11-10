@@ -119,14 +119,16 @@ local function matchFinished()
   local _, _, _, opposingMmr = GetBattlefieldTeamInfo(opposingTeam)
   currentMatch.opposingMmr = opposingMmr
 
-  local teamSize = (GetNumBattlefieldScores() > 4) and 3 or 2
+  local totalPlayers = GetNumBattlefieldScores()
+  local teamSize = (totalPlayers > 4) and 3 or 2
   currentMatch.bracket = teamSize .. "v" .. teamSize
 
   currentMatch.winner = GetBattlefieldWinner()
   currentMatch.comp = getComp(teamSpecs)
   currentMatch.opposingComp = getComp(enemySpecs)
 
-  if currentMatch.ranked then
+  local evenMatch = totalPlayers == 6 or totalPlayers == 4
+  if currentMatch.ranked and evenMatch then
     addCurrentMatchToDb()
   end
 end
