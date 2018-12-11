@@ -1,6 +1,9 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v2.3.1
+- updated for 8.1
+
 v2.3
 - only persist even matches (i.e. same number of players on both teams) in arena history
 
