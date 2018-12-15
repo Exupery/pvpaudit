@@ -24,7 +24,9 @@ local function tooltipOnShow(tooltip)
 
     local _, results = C_LFGList.GetSearchResults()
     for _, r in pairs(results) do
-      local id, _, groupName, desc, voice, _, _, _, _, _, _, _, leader = C_LFGList.GetSearchResultInfo(r)
+      local searchResultInfo = C_LFGList.GetSearchResultInfo(r);
+      local leader = searchResultInfo.leaderName
+      local groupName = searchResultInfo.name
       if txt == groupName then
         addToTooltip(tooltip, leader)
       end
