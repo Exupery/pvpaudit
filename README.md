@@ -3,9 +3,11 @@
 PvPAudit helps you find appropriate PvP partners by making it easy to quickly see:
 
 * your history with another player (arena only)
+* your history with each comp you've played (arena only)
+* your history on each map (arena only)
 * the PvP experience and current ratings of another player (arena and RBGs)
 
-## Partner History
+## Arena History
 For any player your current character has played one or more (rated) arena matches with the tooltip (both regular tooltip and the one used by the LFG tool) will display:
 
 * win/loss record with that player
