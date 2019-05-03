@@ -2,7 +2,7 @@
 ## Title: PvPAudit
 ## Notes: Audits potential PvP partners
 ## Author: Exupery - Emerald Dream
-## Version: 2.3.2
+## Version: 2.3.3
 ## SavedVariables: PvPAuditPlayerCache, PvPAuditArenaHistory
 
 PvPAudit.lua

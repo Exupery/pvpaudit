@@ -7,7 +7,6 @@ local eventFrame = nil
 
 local TARGET = "target"
 local BRACKETS = { "2v2", "3v3", "5v5", "RBG" }
-local MAX_ATTEMPTS = 2
 local MAX_CACHE_AGE = 2592000 -- 30 DAYS
 
 local achievements = {
@@ -43,8 +42,6 @@ local rbgRatings = {
 
 local auditTarget = TARGET
 local targetCurrentRatings = {}
-
-local attempts = 0
 
 local printTo = nil
 
@@ -157,7 +154,6 @@ local function cleanup(auditFunction)
     groupAuditsCompleted = 0
     groupAuditTargets = {}
     eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
-    eventFrame:UnregisterEvent("INSPECT_HONOR_UPDATE")
     eventFrame:UnregisterEvent("INSPECT_READY")
   end
 end
@@ -250,21 +246,6 @@ local function getRbgHighest()
   end
 end
 
--- INSPECT_HONOR_UPDATE may fire before CR data is actually available
--- if CRs for all brackets are zero then rescan up to MAX_ATTEMPTS
-local function shouldRescan()
-  attempts = attempts + 1
-  if attempts >= MAX_ATTEMPTS then
-    return false
-  end
-
-  for _, r in pairs(targetCurrentRatings) do
-    if r > 0 then return false end
-  end
-
-  return true
-end
-
 local function onUpdate(self, elapsed)
   if auditTarget ~= TARGET and groupAuditsCompleted < GetNumGroupMembers() then
     groupAuditTime = groupAuditTime + elapsed
@@ -314,18 +295,12 @@ local function cacheAll(name, realm, slug)
 end
 
 local function onInspectReady()
-  eventFrame:RegisterEvent("INSPECT_HONOR_UPDATE")
-  RequestInspectHonorData()
-end
-
-local function onHonorInspectReady()
-  getCurrentRatings()
-
-  if shouldRescan() then
-    audit(auditTarget)
-  else
+  if HasInspectHonorData() then
+    getCurrentRatings()
     eventFrame:RegisterEvent("INSPECT_ACHIEVEMENT_READY")
     SetAchievementComparisonUnit(auditTarget)
+  else
+    errorPrint("Unable to audit - honor data not available")
   end
 end
 
@@ -357,9 +332,7 @@ local function addonLoaded()
 end
 
 local function eventHandler(self, event, unit, ...)
-  if event == "INSPECT_HONOR_UPDATE" then
-    onHonorInspectReady()
-  elseif event == "INSPECT_ACHIEVEMENT_READY" then
+  if event == "INSPECT_ACHIEVEMENT_READY" then
     onAchievementInspectReady()
   elseif event == "INSPECT_READY" then
     onInspectReady()
