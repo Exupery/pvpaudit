@@ -1,6 +1,9 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v2.3.4
+- updated for 8.2
+
 v2.3.3
 - eliminated lag between requesting audit and output
 

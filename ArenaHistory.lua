@@ -1,4 +1,4 @@
-local GREEN_TEAM = 0
+local PURPLE_TEAM = 0
 local GOLD_TEAM = 1
 local SPEC_ID_MAP = {}
 
@@ -115,7 +115,7 @@ local function matchFinished()
 
   local _, _, _, teamMmr = GetBattlefieldTeamInfo(currentMatch.playerTeam)
   currentMatch.mmr = teamMmr
-  local opposingTeam = (currentMatch.playerTeam == GREEN_TEAM) and GOLD_TEAM or GREEN_TEAM
+  local opposingTeam = (currentMatch.playerTeam == PURPLE_TEAM) and GOLD_TEAM or PURPLE_TEAM
   local _, _, _, opposingMmr = GetBattlefieldTeamInfo(opposingTeam)
   currentMatch.opposingMmr = opposingMmr
 
