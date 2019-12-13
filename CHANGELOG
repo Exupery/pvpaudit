@@ -4,6 +4,7 @@ PVPAUDIT CHANGE LOG
 v2.4
 - included opening the history GUI in help output
 - made help entries for auditing more succinct
+- corrected display of "100%" entries in history GUI ratio columns
 
 v2.3.5
 - updated for 8.2.5

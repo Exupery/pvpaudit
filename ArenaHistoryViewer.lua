@@ -217,9 +217,9 @@ local function drawTable()
   tableFrame:SetHeight(viewer:GetHeight() - 35)
 
   identifierHeading = createColumnHeader(IDENTIFIER, tableFrame, "TOPLEFT", 0.5)
-  local wins = createColumnHeader("Wins", identifierHeading, "TOPRIGHT", 0.15)
-  local losses = createColumnHeader("Losses", wins, "TOPRIGHT", 0.15)
-  local ratio = createColumnHeader("Ratio", losses, "TOPRIGHT", 0.2)
+  local wins = createColumnHeader("Wins", identifierHeading, "TOPRIGHT", 0.14)
+  local losses = createColumnHeader("Losses", wins, "TOPRIGHT", 0.14)
+  local ratio = createColumnHeader("Ratio", losses, "TOPRIGHT", 0.22)
 
   dataBorderFrame:SetPoint("BOTTOMLEFT", tableFrame, "BOTTOMLEFT", -4, -2)
   dataBorderFrame:SetWidth(tableFrame:GetWidth() + 1)
