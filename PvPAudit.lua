@@ -51,7 +51,7 @@ local groupAuditsCompleted = 0
 local groupAuditTime = 0
 
 local function colorPrint(msg)
-  print("|cffb2b2b2" .. msg)
+  print("|cffebff00" .. msg)
 end
 
 local function classColorPrint(msg, class)
@@ -349,14 +349,13 @@ local function onLoad()
 end
 
 local function printHelp()
-  colorPrint("PvPAudit commands:")
+  colorPrint("PvPAudit player audit commands:")
   print("/pvpaudit - audit the current target")
-  print("/pvpaudit i or /pvpaudit instance - audit the current target and output to /instance")
-  print("/pvpaudit p or /pvpaudit party - audit the current target and output to /party")
-  print("/pvpaudit r or /pvpaudit raid - audit the current target and output to /raid")
-  print("To audit ALL current group members and output a specific bracket append the bracket after any of the above commands.")
-  print("Arena brackets can be provided by either single (e.g. '3') or three character identifiers (e.g. '3v3')")
-  print("Examples: /pvpaudit 3v3, /pvpaudit i 2, /pvpaudit raid rbg")
+  print("/pvpaudit instance - audit the current target and output to /instance")
+  print("/pvpaudit party - audit the current target and output to /party")
+  print("/pvpaudit raid - audit the current target and output to /raid")
+  colorPrint("PvPAudit arena history commands:")
+  print("/pvpaudit h or /pvpaudit history - open arena history window")
   print("/pvpaudit ? or /pvpaudit help - Print this list")
 end
 
@@ -371,6 +370,8 @@ SlashCmdList["PVPAUDIT"] = function(arg)
     printHelp()
   elseif string.match(arg, "h.*") then
     PvPAuditHistoryCmd(arg)
+  elseif string.match(arg, "clear.*") then
+    PvPArenaHistoryClear(arg)
   else
     if string.match(arg, "i.*") then
       printTo = "INSTANCE_CHAT"
