@@ -356,6 +356,10 @@ local function printHelp()
   print("/pvpaudit raid - audit the current target and output to /raid")
   colorPrint("PvPAudit arena history commands:")
   print("/pvpaudit h or /pvpaudit history - open arena history window")
+  print("/pvpaudit clear players - removes all players from arena history")
+  print("/pvpaudit clear comps - removes all team compositions from arena history")
+  print("/pvpaudit clear maps - removes all maps from arena history")
+  print("/pvpaudit clear all - removes ALL data from arena history")
   print("/pvpaudit ? or /pvpaudit help - Print this list")
 end
 

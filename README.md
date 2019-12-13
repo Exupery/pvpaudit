@@ -38,6 +38,10 @@ Please note Blizzard requires some proximity to collect the necessary data so ru
 * `/pvpaudit p` or `/pvpaudit party` - audit the current target and output to /party
 * `/pvpaudit r` or `/pvpaudit raid` - audit the current target and output to /raid
 * `/pvpaudit h` or `/pvpaudit history` - open the arena partner/comps/maps history viewer
+* `/pvpaudit clear players` - removes all players from arena history
+* `/pvpaudit clear comps` - removes all team compositions from arena history
+* `/pvpaudit clear maps` - removes all maps from arena history
+* `/pvpaudit clear all` - removes ALL data from arena history
 * `/pvpaudit ?` or `/pvpaudit help` - print the command list
 
 To audit **all** current group members for a specific bracket append the bracket after any of the above audit commands. Arena brackets can be provided by either single (e.g. `3`) or three character identifiers (e.g. `3v3`)
@@ -49,4 +53,3 @@ Commands can be ran with `/pa` instead of `/pvpaudit` - unless another addon is 
 * add option to hide history from tooltips
 * for past arena partners allow including a note for display in tooltip along with history
 * include opposing comps in the history viewer
-* allow clearing of player/comp/map history

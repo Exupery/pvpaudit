@@ -158,9 +158,13 @@ local function populateSpecIdMap()
   end
 end
 
+local function setBrackets(key)
+  arenaDb[key] = { ["2v2"]={}, ["3v3"]={} }
+end
+
 -- Checks if `arenaDb` has `key` and if not adds a table for each arena bracket
 local function checkAndSetBrackets(key)
-  if arenaDb[key] == nil then arenaDb[key] = { ["2v2"]={}, ["3v3"]={} } end
+  if arenaDb[key] == nil then setBrackets(key) end
 end
 
 local function addonLoaded()
@@ -207,6 +211,29 @@ local function onLoad()
   eventFrame:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
   eventFrame:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
   eventFrame:SetScript("OnEvent", eventHandler)
+end
+
+function PvPArenaHistoryClear(arg)
+  if string.match(arg:lower(), ".*players") then
+    setBrackets("players")
+    print("Player data cleared")
+  elseif string.match(arg:lower(), ".*comps") then
+    setBrackets("comps")
+    setBrackets("opposingComps")
+    print("Team composition data cleared")
+  elseif string.match(arg:lower(), ".*maps") then
+    setBrackets("maps")
+    print("Map data cleared")
+  elseif string.match(arg:lower(), ".*all") then
+    setBrackets("players")
+    setBrackets("comps")
+    setBrackets("opposingComps")
+    setBrackets("maps")
+    print("ALL arena history data cleared")
+  else
+    print("Unknown flag: "..arg)
+    print("Run /pvpaudit ? or /pvpaudit help for valid flags")
+  end
 end
 
 onLoad()
