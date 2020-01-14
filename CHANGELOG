@@ -1,6 +1,9 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v2.4.1
+- updated for 8.3
+
 v2.4
 - added the ability to clear arena match history
 - included opening the history GUI in help output
