@@ -42,6 +42,7 @@ Please note Blizzard requires some proximity to collect the necessary data so ru
 * `/pvpaudit clear comps` - removes all team compositions from arena history
 * `/pvpaudit clear maps` - removes all maps from arena history
 * `/pvpaudit clear all` - removes ALL data from arena history
+* `/pvpaudit config` - open the configuration panel
 * `/pvpaudit ?` or `/pvpaudit help` - print the command list
 
 To audit **all** current group members for a specific bracket append the bracket after any of the above audit commands. Arena brackets can be provided by either single (e.g. `3`) or three character identifiers (e.g. `3v3`)

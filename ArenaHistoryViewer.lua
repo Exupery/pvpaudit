@@ -2,7 +2,6 @@ local BRACKETS = { "2v2", "3v3" }
 local CATEGORIES = { "Maps", "Comps", "Players" }
 
 local IDENTIFIER = "Identifier"
-local FONT = "Fonts\\FRIZQT__.TTF"
 
 local arenaDb = nil
 local eventFrame = nil
@@ -34,24 +33,24 @@ local function sortTableKeys(tbl)
   return sorted
 end
 
-local function createCell(row, colHeader, text, anchor, anchorPoint)
+local function createCell(row, colHeader, text, anchor, anchorPoint, font)
   local key = tableDataFrame:GetName()..row..colHeader
   local cell = cells[key]
 
   if cell == nil then
     cell = tableDataFrame:CreateFontString(key, "ARTWORK", "GameTooltipTextSmall")
     cell:SetPoint("TOPLEFT", anchor, anchorPoint, 0, 0)
-    cell:SetWidth(_G[tableFrame:GetName()..colHeader]:GetWidth() - 3)
+    cell:SetWidth(_G[tableFrame:GetName()..colHeader]:GetWidth() - 1)
     cell:SetHeight(_G[tableFrame:GetName()..IDENTIFIER]:GetHeight())
     if colHeader == IDENTIFIER then
       cell:SetJustifyH("LEFT")
     else
       cell:SetJustifyH("RIGHT")
     end
-    cell:SetFont(FONT, _G[tableFrame:GetName()..IDENTIFIER]:GetHeight())
     cells[key] = cell
   end
 
+  cell:SetFont(font, _G[tableFrame:GetName()..IDENTIFIER]:GetHeight())
   cell:SetText(text)
   cell:Show()
   return cell
@@ -132,6 +131,8 @@ local function populateTable()
   local cat = CATEGORIES[catId]:lower()
   local data = arenaDb[cat][bracket]
   if not data then return end
+
+  local font = PVPAUDIT_FONTS[PvPAuditConfig["fontstyle"]]
   local row = 1
   local idCellAnchor = tableDataFrame
   local idCellAnchorPoint = "TOPLEFT"
@@ -145,11 +146,11 @@ local function populateTable()
     if cat == "comps" then
       idCell = createCompCell(row, k, idCellAnchor, idCellAnchorPoint)
     else
-      idCell = createCell(row, IDENTIFIER, k, idCellAnchor, idCellAnchorPoint)
+      idCell = createCell(row, IDENTIFIER, k, idCellAnchor, idCellAnchorPoint, font)
     end
-    local wCell = createCell(row, "Wins", t.w, idCell, "TOPRIGHT")
-    local lCell = createCell(row, "Losses", t.l, wCell, "TOPRIGHT")
-    local rCell = createCell(row, "Ratio", string.format("%.1f", ratio).."%     ", lCell, "TOPRIGHT")
+    local wCell = createCell(row, "Wins", t.w, idCell, "TOPRIGHT", font)
+    local lCell = createCell(row, "Losses", t.l, wCell, "TOPRIGHT", font)
+    local rCell = createCell(row, "Ratio", string.format("%.0f", ratio).."%     ", lCell, "TOPRIGHT", font)
     row = row + 1
     idCellAnchor = idCell
     idCellAnchorPoint = "BOTTOMLEFT"
@@ -217,9 +218,9 @@ local function drawTable()
   tableFrame:SetHeight(viewer:GetHeight() - 35)
 
   identifierHeading = createColumnHeader(IDENTIFIER, tableFrame, "TOPLEFT", 0.5)
-  local wins = createColumnHeader("Wins", identifierHeading, "TOPRIGHT", 0.14)
-  local losses = createColumnHeader("Losses", wins, "TOPRIGHT", 0.14)
-  local ratio = createColumnHeader("Ratio", losses, "TOPRIGHT", 0.22)
+  local wins = createColumnHeader("Wins", identifierHeading, "TOPRIGHT", 0.12)
+  local losses = createColumnHeader("Losses", wins, "TOPRIGHT", 0.12)
+  local ratio = createColumnHeader("Ratio", losses, "TOPRIGHT", 0.25)
 
   dataBorderFrame:SetPoint("BOTTOMLEFT", tableFrame, "BOTTOMLEFT", -4, -2)
   dataBorderFrame:SetWidth(tableFrame:GetWidth() + 1)

@@ -3,11 +3,29 @@ SLASH_PVPAUDIT2 = "/pa"
 BINDING_HEADER_PVPAUDIT = "PvPAudit"
 BINDING_NAME_PVPAUDIT1 = "Audit the current target"
 
-local eventFrame = nil
-
 local TARGET = "target"
 local BRACKETS = { "2v2", "3v3", "5v5", "RBG" }
 local MAX_CACHE_AGE = 2592000 -- 30 DAYS
+
+local DEFAULT_FONT = "Arial"
+
+PVPAUDIT_FONTS = {
+  Arial = "Fonts\\ARIALN.TTF",
+  FritzQuad = "Fonts\\FRIZQT__.TTF",
+  Morpheus = "Fonts\\MORPHEUS.ttf",
+  Skurri = "Fonts\\skurri.ttf",
+  Emblem = "Interface\\Addons\\PvPAudit\\Fonts\\Emblem.ttf",
+  SfDiegoSans = "Interface\\Addons\\PvPAudit\\Fonts\\SF Diego Sans.ttf",
+  koKR = "Fonts\\2002.ttf",
+  ruRU = "Fonts\\ARIALN.TTF",
+  zhCN = "Fonts\\ARKai_T.ttf",
+  zhTW = "Fonts\\bkAI00M.ttf",
+}
+
+local eventFrame = nil
+local optionsFrame = nil
+local config = {}
+local tempConfig = {}
 
 local achievements = {
   [1174] = "Arena Master",
@@ -69,6 +87,16 @@ local function output(msg)
   else
     SendChatMessage(msg, printTo)
   end
+end
+
+local function sortedKeys(tbl)
+  local sorted = {}
+  for k, _ in pairs(tbl) do
+    table.insert(sorted, k)
+  end
+  table.sort(sorted)
+
+  return sorted
 end
 
 local function printPlayerInfo(playerSlug)
@@ -321,12 +349,119 @@ local function tidyCache()
   end
 end
 
+local function createLabel(text, parent, xOffset, yOffset)
+  local label = parent:CreateFontString("PvPAudit"..text.."Label", "OVERLAY", "GameFontNormal")
+  label:SetPoint("TOPLEFT", xOffset, yOffset)
+  label:SetText(text)
+  return label
+end
+
+local function createDropDown(name, parent, callback, tableValues, selectedValue)
+  local SelectBox = LibStub:GetLibrary("SelectBox")
+  local dropdown = SelectBox:Create(name, parent, 120, callback, function() return tableValues end, selectedValue)
+  dropdown:ClearAllPoints()
+  dropdown:UpdateValue()
+  return dropdown
+end
+
+local function setFontStyle(style)
+  local font = PVPAUDIT_FONTS[style]
+  if not font then return end
+  config.fontstyle = style
+end
+
+local function fontStyleSelected(self)
+  tempConfig.fontstyle = self.value
+end
+
+local function getSelectedFontStyle()
+  return tempConfig.fontstyle ~= nil and tempConfig.fontstyle or config.fontstyle
+end
+
+local function drawFontStyleOptions(parent, xOffset, yOffset)
+  local label = createLabel("Font", parent, xOffset, yOffset)
+
+  local fonts = sortedKeys(PVPAUDIT_FONTS)
+  local selectedFont = getSelectedFontStyle()
+  parent.fontstyle = createDropDown("PvPAuditFontStyle", parent, fontStyleSelected, fonts, selectedFont)
+  parent.fontstyle:SetPoint("LEFT", label, "RIGHT", 0, 0)
+end
+
+local function updateConfig(key, value)
+  PvPAuditConfig[key] = value
+  local updated = PvPAuditConfig[key] == value
+  if updated then
+    config = PvPAuditConfig
+  end
+  return updated
+end
+
+local function resetTempConfig()
+  tempConfig = {}
+end
+
+local function defaultConfig()
+  return {
+    fontstyle = DEFAULT_FONT,
+  }
+end
+
+local function saveOptions()
+  setFontStyle(getSelectedFontStyle())
+  updateConfig("fontstyle", getSelectedFontStyle())
+  resetTempConfig()
+end
+
+local function cancelOptions()
+  resetTempConfig()
+  config = PvPAuditConfig
+  setFontStyle(PvPAuditConfig["fontstyle"])
+  optionsFrame.fontstyle:SetText(PvPAuditConfig["fontstyle"])
+end
+
+local function defaultOptions()
+  config = defaultConfig()
+  PvPAuditConfig = defaultConfig()
+  InterfaceOptionsFrame:Hide()
+  resetTempConfig()
+end
+
+local function createOptionsPanel()
+  config = PvPAuditConfig
+
+  local xOffset = 20
+  optionsFrame = CreateFrame("Frame", "PvPAuditOptions", UIParent)
+  optionsFrame.name = "PvPAudit"
+  InterfaceOptions_AddCategory(optionsFrame)
+
+  optionsFrame.okay = saveOptions
+  optionsFrame.cancel = cancelOptions
+  optionsFrame.default = defaultOptions
+
+  optionsFrame.title = optionsFrame:CreateFontString("PvPAuditOptionsTitle", "OVERLAY", "GameFontNormalLarge")
+  optionsFrame.title:SetPoint("TOPLEFT", xOffset, -20)
+  optionsFrame.title:SetText("PvPAudit Options")
+
+  drawFontStyleOptions(optionsFrame, xOffset, -130)
+
+  optionsFrame.fontstyle:SetText(getSelectedFontStyle())
+end
+
 local function addonLoaded()
   if not PvPAuditPlayerCache then
     PvPAuditPlayerCache = {}
   else
     tidyCache()
   end
+
+  if not PvPAuditConfig then
+    PvPAuditConfig = defaultConfig()
+  end
+  for k, v in pairs(defaultConfig()) do
+    if PvPAuditConfig[k] == nil then PvPAuditConfig[k] = v end
+  end
+
+  createOptionsPanel()
 
   print("PvPAudit loaded, to audit the current target type /pvpaudit")
 end
@@ -360,6 +495,8 @@ local function printHelp()
   print("/pvpaudit clear comps - removes all team compositions from arena history")
   print("/pvpaudit clear maps - removes all maps from arena history")
   print("/pvpaudit clear all - removes ALL data from arena history")
+  colorPrint("Other PvPAudit commands:")
+  print("/pvpaudit config - open the configuration panel")
   print("/pvpaudit ? or /pvpaudit help - Print this list")
 end
 
@@ -374,6 +511,10 @@ SlashCmdList["PVPAUDIT"] = function(arg)
     printHelp()
   elseif string.match(arg, "h.*") then
     PvPAuditHistoryCmd(arg)
+  elseif string.match(arg, "config") then
+    -- call twice to workaround WoW bug where very first call opens wrong tab
+    InterfaceOptionsFrame_OpenToCategory("PvPAudit")
+    InterfaceOptionsFrame_OpenToCategory("PvPAudit")
   elseif string.match(arg, "clear.*") then
     PvPArenaHistoryClear(arg)
   else

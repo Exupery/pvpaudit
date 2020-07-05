@@ -1,6 +1,11 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v2.4.2
+- added options panel to select font
+- changed default font for history viewer to Arial
+- history viewer ratio no longer includes tenths of a percent
+
 v2.4.1
 - updated for 8.3
 
