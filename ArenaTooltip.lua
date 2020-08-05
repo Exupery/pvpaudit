@@ -58,8 +58,8 @@ function PvPAuditLoadHoverModule()
   eventFrame = CreateFrame("Frame", "PvPAuditHoverEventFrame", UIParent)
   eventFrame:SetScript("OnEvent", eventHandler)
 
-  GameTooltip:SetScript("OnTooltipSetUnit", tooltipUnitUpdate)
-  GameTooltip:SetScript("OnShow", tooltipOnShow)
+  GameTooltip:HookScript("OnTooltipSetUnit", tooltipUnitUpdate)
+  GameTooltip:HookScript("OnShow", tooltipOnShow)
 
   local playerAndRealm = PvPAuditGetPlayerAndRealm()
   arenaDb = PvPAuditArenaHistory[playerAndRealm]
