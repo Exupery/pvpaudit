@@ -1,6 +1,9 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v2.4.4
+- updated for Shadowlands prepatch
+
 v2.4.3
 - fixed bug where this addon may not play nice with other addons that modified tooltips
 

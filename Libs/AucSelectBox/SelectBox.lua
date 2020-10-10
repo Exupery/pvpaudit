@@ -299,7 +299,7 @@ if not lib.menu then
 	menu:SetScript("OnMouseDown", lib.DoHide)
 	menu:SetScript("OnUpdate", lib.OnUpdate)
 
-	menu.back = CreateFrame("Frame", "", lib.menu)
+	menu.back = CreateFrame("Frame", "", lib.menu, BackdropTemplateMixin and "BackdropTemplate")
 	menu.back:SetPoint("TOPLEFT", lib.menu, "TOPLEFT", 15, -20)
 	menu.back:SetPoint("BOTTOMRIGHT", lib.menu, "BOTTOMRIGHT", -15, 10)
 	menu.back:SetBackdrop({

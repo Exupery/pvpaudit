@@ -323,13 +323,9 @@ local function cacheAll(name, realm, slug)
 end
 
 local function onInspectReady()
-  if HasInspectHonorData() then
-    getCurrentRatings()
-    eventFrame:RegisterEvent("INSPECT_ACHIEVEMENT_READY")
-    SetAchievementComparisonUnit(auditTarget)
-  else
-    errorPrint("Unable to audit - honor data not available")
-  end
+  getCurrentRatings()
+  eventFrame:RegisterEvent("INSPECT_ACHIEVEMENT_READY")
+  SetAchievementComparisonUnit(auditTarget)
 end
 
 local function onAchievementInspectReady()
