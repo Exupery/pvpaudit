@@ -1,8 +1,8 @@
-## Interface: 90001
+## Interface: 90002
 ## Title: PvPAudit
 ## Notes: Audits potential PvP partners
 ## Author: Exuperjun - Emerald Dream
-## Version: 2.4.4
+## Version: 2.4.5
 ## SavedVariables: PvPAuditPlayerCache, PvPAuditArenaHistory, PvPAuditConfig
 
 Libs\LibStub\LibStub.lua
