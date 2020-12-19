@@ -6,11 +6,24 @@ local BRACKETS = { "2v2", "3v3" }
 -- adds W/L data to tooltip if DB has data for `name`
 local function addToTooltip(tooltip, name)
   if not name then return end
-  for _, bracket in pairs(BRACKETS) do
-    local target = arenaDb["players"][bracket][name]
-    if target then
-      local mmrRange = target.lowMmr .. "-" .. target.hiMmr
-      local str = string.format("%s W: %d L: %d MMR: %s", bracket, target.w, target.l, mmrRange)
+
+  if PvPAuditConfig["showHistory"] then
+    for _, bracket in pairs(BRACKETS) do
+      local target = arenaDb["players"][bracket][name]
+      if target then
+        local mmrRange = target.lowMmr .. "-" .. target.hiMmr
+        local str = string.format("%s W: %d L: %d MMR: %s", bracket, target.w, target.l, mmrRange)
+        tooltip:AddLine(str)
+        tooltip:Show()
+      end
+    end
+  end
+
+  if PvPAuditConfig["showAudit"] and PvPAuditPlayerCache[name] ~= nil then
+    for _, bracket in pairs(BRACKETS) do
+      local exp = PvPAuditPlayerCache[name][bracket]["highest"]
+      local cr = PvPAuditPlayerCache[name][bracket]["cr"]
+      local str = string.format("%s %d EXP [%d CR]", bracket, exp, cr)
       tooltip:AddLine(str)
       tooltip:Show()
     end

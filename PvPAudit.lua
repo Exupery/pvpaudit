@@ -383,6 +383,26 @@ local function drawFontStyleOptions(parent, xOffset, yOffset)
   parent.fontstyle:SetPoint("LEFT", label, "RIGHT", 0, 0)
 end
 
+local function drawHistoryTooltipOption(parent, xOffset, yOffset)
+  local label = createLabel("Show arena player history in tooltip", parent, xOffset, yOffset)
+
+  parent.showHistory = CreateFrame("CheckButton", "PvPAuditShowHistoryCheckBox", parent, "ChatConfigCheckButtonTemplate")
+  parent.showHistory:SetPoint("LEFT", label, "RIGHT", 0, 0)
+  parent.showHistory.tooltip = "If checked arena W/L results will appear in player tooltips"
+  parent.showHistory:SetChecked(true)
+  parent.showHistory:Show()
+end
+
+local function drawAuditTooltipOption(parent, xOffset, yOffset)
+  local label = createLabel("Show arena audit results in tooltip", parent, xOffset, yOffset)
+
+  parent.showAudit = CreateFrame("CheckButton", "PvPAuditShowAuditCheckBox", parent, "ChatConfigCheckButtonTemplate")
+  parent.showAudit:SetPoint("LEFT", label, "RIGHT", 0, 0)
+  parent.showAudit.tooltip = "If checked the arena EXP/CR of previously audited players will appear in tooltips"
+  parent.showAudit:SetChecked(true)
+  parent.showAudit:Show()
+end
+
 local function updateConfig(key, value)
   PvPAuditConfig[key] = value
   local updated = PvPAuditConfig[key] == value
@@ -399,12 +419,16 @@ end
 local function defaultConfig()
   return {
     fontstyle = DEFAULT_FONT,
+    showHistory = true,
+    showAudit = true
   }
 end
 
 local function saveOptions()
   setFontStyle(getSelectedFontStyle())
   updateConfig("fontstyle", getSelectedFontStyle())
+  updateConfig("showHistory", optionsFrame.showHistory:GetChecked())
+  updateConfig("showAudit", optionsFrame.showAudit:GetChecked())
   resetTempConfig()
 end
 
@@ -413,6 +437,8 @@ local function cancelOptions()
   config = PvPAuditConfig
   setFontStyle(PvPAuditConfig["fontstyle"])
   optionsFrame.fontstyle:SetText(PvPAuditConfig["fontstyle"])
+  optionsFrame.showHistory:SetChecked(PvPAuditConfig["showHistory"])
+  optionsFrame.showAudit:SetChecked(PvPAuditConfig["showAudit"])
 end
 
 local function defaultOptions()
@@ -439,6 +465,8 @@ local function createOptionsPanel()
   optionsFrame.title:SetText("PvPAudit Options")
 
   drawFontStyleOptions(optionsFrame, xOffset, -130)
+  drawHistoryTooltipOption(optionsFrame, xOffset, -230)
+  drawAuditTooltipOption(optionsFrame, xOffset, -280)
 
   optionsFrame.fontstyle:SetText(getSelectedFontStyle())
 end
