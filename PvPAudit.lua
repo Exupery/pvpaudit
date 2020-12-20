@@ -189,7 +189,10 @@ end
 local function getNameRealmSlug()
   local name, realm = UnitName(auditTarget)
   if realm == nil then realm = "" end
-  local slug = name .. realm
+  local slug = name
+  if realm ~= "" then
+    slug = name .. "-" .. realm
+  end
 
   return  name, realm, slug
 end
@@ -241,8 +244,7 @@ local function auditGroup()
   end
 end
 
-local function cachePlayerInfo(name, realm)
-  local playerSlug = name .. realm
+local function cachePlayerInfo(name, realm, playerSlug)
   local _, localeIndependentClass = UnitClass(auditTarget)
 
   PvPAuditPlayerCache[playerSlug]["name"] = name
@@ -317,7 +319,7 @@ end
 local function cacheAll(name, realm, slug)
   PvPAuditPlayerCache[slug] = {}
 
-  cachePlayerInfo(name, realm)
+  cachePlayerInfo(name, realm, slug)
   cacheRatings(slug)
   cacheAchievements(slug)
 end
