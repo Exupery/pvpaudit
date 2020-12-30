@@ -391,7 +391,7 @@ local function drawHistoryTooltipOption(parent, xOffset, yOffset)
   parent.showHistory = CreateFrame("CheckButton", "PvPAuditShowHistoryCheckBox", parent, "ChatConfigCheckButtonTemplate")
   parent.showHistory:SetPoint("LEFT", label, "RIGHT", 0, 0)
   parent.showHistory.tooltip = "If checked arena W/L results will appear in player tooltips"
-  parent.showHistory:SetChecked(true)
+  parent.showHistory:SetChecked(PvPAuditConfig["showHistory"])
   parent.showHistory:Show()
 end
 
@@ -401,7 +401,7 @@ local function drawAuditTooltipOption(parent, xOffset, yOffset)
   parent.showAudit = CreateFrame("CheckButton", "PvPAuditShowAuditCheckBox", parent, "ChatConfigCheckButtonTemplate")
   parent.showAudit:SetPoint("LEFT", label, "RIGHT", 0, 0)
   parent.showAudit.tooltip = "If checked the arena EXP/CR of previously audited players will appear in tooltips"
-  parent.showAudit:SetChecked(true)
+  parent.showAudit:SetChecked(PvPAuditConfig["showAudit"])
   parent.showAudit:Show()
 end
 
