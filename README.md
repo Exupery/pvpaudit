@@ -37,7 +37,7 @@ Please note Blizzard requires some proximity to collect the necessary data so ru
 * `/pvpaudit i` or `/pvpaudit instance` - audit the current target and output to /instance
 * `/pvpaudit p` or `/pvpaudit party` - audit the current target and output to /party
 * `/pvpaudit r` or `/pvpaudit raid` - audit the current target and output to /raid
-* `/pvpaudit o` or `/pvpaudit officer` - audit the current target and output to /party
+* `/pvpaudit o` or `/pvpaudit officer` - audit the current target and output to /officer
 ## Arena History Commands
 * `/pvpaudit h` or `/pvpaudit history` - open the arena partner/comps/maps history viewer
 * `/pvpaudit clear players` - removes all players from arena history
