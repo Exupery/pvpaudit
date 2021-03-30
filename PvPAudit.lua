@@ -515,6 +515,7 @@ local function printHelp()
   print("/pvpaudit instance - audit the current target and output to /instance")
   print("/pvpaudit party - audit the current target and output to /party")
   print("/pvpaudit raid - audit the current target and output to /raid")
+  print("/pvpaudit officer - audit the current target and output to guild officer chat")
   colorPrint("PvPAudit arena history commands:")
   print("/pvpaudit h or /pvpaudit history - open arena history window")
   print("/pvpaudit clear players - removes all players from arena history")
@@ -548,6 +549,8 @@ SlashCmdList["PVPAUDIT"] = function(arg)
       printTo = "INSTANCE_CHAT"
     elseif string.match(arg, "p.*") then
       printTo = "PARTY"
+    elseif string.match(arg, "o.*") then
+      printTo = "OFFICER"
     elseif string.match(arg, "r.*") and arg:lower() ~= "rbg" then
       printTo = "RAID"
     else

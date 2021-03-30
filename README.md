@@ -32,16 +32,19 @@ Please note Blizzard requires some proximity to collect the necessary data so ru
 * WoW's compare achievements functionality (used for determining what achievements the target has earned) returns achievements a player has earned on any character on that account by default, not just that specific character (players can toggle this in Interface => Display). As a result a character's highest rating may be lower than what would seem required for an achievement.
 * WoW's API for getting arena info often has a short (about a second) delay, this is only slightly noticeable when auditing a single target but more pronounced if doing a group audit on a large raid
 
-## Commands
+## Player Audit Commands
 * `/pvpaudit` - audit the current target
 * `/pvpaudit i` or `/pvpaudit instance` - audit the current target and output to /instance
 * `/pvpaudit p` or `/pvpaudit party` - audit the current target and output to /party
 * `/pvpaudit r` or `/pvpaudit raid` - audit the current target and output to /raid
+* `/pvpaudit o` or `/pvpaudit officer` - audit the current target and output to /party
+## Arena History Commands
 * `/pvpaudit h` or `/pvpaudit history` - open the arena partner/comps/maps history viewer
 * `/pvpaudit clear players` - removes all players from arena history
 * `/pvpaudit clear comps` - removes all team compositions from arena history
 * `/pvpaudit clear maps` - removes all maps from arena history
 * `/pvpaudit clear all` - removes ALL data from arena history
+## General Commands
 * `/pvpaudit config` - open the configuration panel
 * `/pvpaudit ?` or `/pvpaudit help` - print the command list
 
