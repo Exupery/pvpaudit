@@ -114,6 +114,9 @@ end
 
 -- Print player's ratings for a single bracket
 local function printRating(playerSlug, bracket)
+  if bracket == "5v5" and not PvPAuditConfig["show5v5"] then
+    return
+  end
   local highest = PvPAuditPlayerCache[playerSlug][bracket]["highest"]
   local cr = PvPAuditPlayerCache[playerSlug][bracket]["cr"]
 
@@ -385,24 +388,36 @@ local function drawFontStyleOptions(parent, xOffset, yOffset)
   parent.fontstyle:SetPoint("LEFT", label, "RIGHT", 0, 0)
 end
 
-local function drawHistoryTooltipOption(parent, xOffset, yOffset)
-  local label = createLabel("Show arena player history in tooltip", parent, xOffset, yOffset)
+local function drawConfigCheckOption(parent, xOffset, yOffset, title, description,
+    uiOptionName, frameName, checked)
+  local label = createLabel(title, parent, xOffset, yOffset)
 
-  parent.showHistory = CreateFrame("CheckButton", "PvPAuditShowHistoryCheckBox", parent, "ChatConfigCheckButtonTemplate")
-  parent.showHistory:SetPoint("LEFT", label, "RIGHT", 0, 0)
-  parent.showHistory.tooltip = "If checked arena W/L results will appear in player tooltips"
-  parent.showHistory:SetChecked(PvPAuditConfig["showHistory"])
-  parent.showHistory:Show()
+  parent[uiOptionName] = CreateFrame("CheckButton", frameName, parent, "ChatConfigCheckButtonTemplate")
+  parent[uiOptionName]:SetPoint("LEFT", label, "RIGHT", 0, 0)
+  parent[uiOptionName].tooltip = description
+  parent[uiOptionName]:SetChecked(checked)
+  parent[uiOptionName]:Show()
+end
+
+local function drawHistoryTooltipOption(parent, xOffset, yOffset)
+  drawConfigCheckOption(parent, xOffset, yOffset,
+    "Show arena player history in tooltip",
+    "If checked arena W/L results will appear in player tooltips",
+    "showHistory", "PvPAuditShowHistoryCheckBox", PvPAuditConfig["showHistory"])
 end
 
 local function drawAuditTooltipOption(parent, xOffset, yOffset)
-  local label = createLabel("Show arena audit results in tooltip", parent, xOffset, yOffset)
+  drawConfigCheckOption(parent, xOffset, yOffset,
+    "Show arena audit results in tooltip",
+    "If checked the arena EXP/CR of previously audited players will appear in tooltips",
+    "showAudit", "PvPAuditShowAuditCheckBox", PvPAuditConfig["showAudit"])
+end
 
-  parent.showAudit = CreateFrame("CheckButton", "PvPAuditShowAuditCheckBox", parent, "ChatConfigCheckButtonTemplate")
-  parent.showAudit:SetPoint("LEFT", label, "RIGHT", 0, 0)
-  parent.showAudit.tooltip = "If checked the arena EXP/CR of previously audited players will appear in tooltips"
-  parent.showAudit:SetChecked(PvPAuditConfig["showAudit"])
-  parent.showAudit:Show()
+local function drawAuditOutputOptions(parent, xOffset, yOffset)
+  drawConfigCheckOption(parent, xOffset, yOffset,
+    "Include 5v5 in audit output",
+    "If checked audit output will include 5v5 EXP/CR",
+    "show5v5", "PvPAuditShow5v5CheckBox", PvPAuditConfig["show5v5"])
 end
 
 local function updateConfig(key, value)
@@ -422,7 +437,8 @@ local function defaultConfig()
   return {
     fontstyle = DEFAULT_FONT,
     showHistory = true,
-    showAudit = true
+    showAudit = true,
+    show5v5 = false
   }
 end
 
@@ -431,6 +447,7 @@ local function saveOptions()
   updateConfig("fontstyle", getSelectedFontStyle())
   updateConfig("showHistory", optionsFrame.showHistory:GetChecked())
   updateConfig("showAudit", optionsFrame.showAudit:GetChecked())
+  updateConfig("show5v5", optionsFrame.show5v5:GetChecked())
   resetTempConfig()
 end
 
@@ -441,6 +458,7 @@ local function cancelOptions()
   optionsFrame.fontstyle:SetText(PvPAuditConfig["fontstyle"])
   optionsFrame.showHistory:SetChecked(PvPAuditConfig["showHistory"])
   optionsFrame.showAudit:SetChecked(PvPAuditConfig["showAudit"])
+  optionsFrame.show5v5:SetChecked(PvPAuditConfig["show5v5"])
 end
 
 local function defaultOptions()
@@ -467,8 +485,9 @@ local function createOptionsPanel()
   optionsFrame.title:SetText("PvPAudit Options")
 
   drawFontStyleOptions(optionsFrame, xOffset, -130)
-  drawHistoryTooltipOption(optionsFrame, xOffset, -230)
-  drawAuditTooltipOption(optionsFrame, xOffset, -280)
+  drawHistoryTooltipOption(optionsFrame, xOffset, -200)
+  drawAuditTooltipOption(optionsFrame, xOffset, -240)
+  drawAuditOutputOptions(optionsFrame, xOffset, -280)
 
   optionsFrame.fontstyle:SetText(getSelectedFontStyle())
 end
