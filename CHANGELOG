@@ -2,7 +2,8 @@ PVPAUDIT CHANGE LOG
 ===================
 
 v2.5.5
-- added option to include 5v5 in audit output or not
+- include rank one titles in notable achievement output (can be optionally disabled)
+- added option to include 5v5 in audit output (disabled by default)
 
 v2.5.4
 - added option to output to officer chat

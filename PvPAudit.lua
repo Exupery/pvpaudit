@@ -34,6 +34,46 @@ local achievements = {
   [6942] = "Hero of the Alliance"
 }
 
+local rankOneAchievements = {
+  -- TBC
+  [418] = "Merciless Gladiator: Season 2",
+  [419] = "Vengeful Gladiator: Season 3",
+  [420] = "Brutal Gladiator: Season 4",
+  -- WotLK
+  [3336] = "Deadly Gladiator: Season 5",
+  [3436] = "Furious Gladiator: Season 6",
+  [3758] = "Relentless Gladiator: Season 7",
+  [4599] = "Wrathful Gladiator: Season 8",
+  -- Cata
+  [6002] = "Vicious Gladiator: Season 9",
+  [6124] = "Ruthless Gladiator: Season 10",
+  [6938] = "Cataclysmic Gladiator: Season 11",
+  -- MoP
+  [8214] = "Malevolent Gladiator: Season 12",
+  [8791] = "Tyrannical Gladiator: Season 13",
+  [8643] = "Grievous Gladiator: Season 14",
+  [8666] = "Prideful Gladiator: Season 15",
+  -- WoD
+  [9232] = "Primal Gladiator: Warlords Season 1",
+  [10096] = "Wild Gladiator: Warlords Season 2",
+  [10097] = "Warmongering Gladiator: Warlords Season 3",
+  --Legion
+  [11012] = "Vindictive Gladiator: Legion Season 1",
+  [11014] = "Fearless Gladiator: Legion Season 2",
+  [11037] = "Cruel Gladiator: Legion Season 3",
+  [11062] = "Ferocious Gladiator: Legion Season 4",
+  [12010] = "Fierce Gladiator: Legion Season 5",
+  [12134] = "Dominant Gladiator: Legion Season 6",
+  [12185] = "Demonic Gladiator: Legion Season 7",
+  -- BfA
+  [12945] = "Dread Gladiator: Battle for Azeroth Season 1",
+  [13200] = "Sinister Gladiator: Battle for Azeroth Season 2",
+  [13630] = "Notorious Gladiator: Battle for Azeroth Season 3",
+  [13957] = "Corrupted Gladiator: Battle for Azeroth Season 4",
+  -- SL
+  [14690] = "Sinful Gladiator: Shadowlands Season 1"
+}
+
 local statistics = {
   [BRACKETS[1]] = 370,
   [BRACKETS[2]] = 595,
@@ -308,14 +348,21 @@ local function cacheRatings(playerSlug)
   end
 end
 
+local function cacheAchievementsFromTable(playerAchievementsCache, achievementTable)
+  for k, v in pairs(achievementTable) do
+    local completed = GetAchievementComparisonInfo(k)
+    if completed then
+      playerAchievementsCache[v] = true
+    end
+  end
+end
+
 local function cacheAchievements(playerSlug)
   PvPAuditPlayerCache[playerSlug]["achievements"] = {}
 
-  for k, v in pairs(achievements) do
-    local completed = GetAchievementComparisonInfo(k)
-    if completed then
-      PvPAuditPlayerCache[playerSlug]["achievements"][v] = true
-    end
+  cacheAchievementsFromTable(PvPAuditPlayerCache[playerSlug]["achievements"], achievements)
+  if PvPAuditConfig["showR1"] then
+    cacheAchievementsFromTable(PvPAuditPlayerCache[playerSlug]["achievements"], rankOneAchievements)
   end
 end
 
@@ -418,6 +465,11 @@ local function drawAuditOutputOptions(parent, xOffset, yOffset)
     "Include 5v5 in audit output",
     "If checked audit output will include 5v5 EXP/CR",
     "show5v5", "PvPAuditShow5v5CheckBox", PvPAuditConfig["show5v5"])
+
+  drawConfigCheckOption(parent, xOffset, yOffset - 40,
+    "Include Rank One titles in audit output",
+    "If checked audit output will include any/all Rank 1 titles obtained",
+    "showR1", "PvPAuditShowR1CheckBox", PvPAuditConfig["showR1"])
 end
 
 local function updateConfig(key, value)
@@ -438,7 +490,8 @@ local function defaultConfig()
     fontstyle = DEFAULT_FONT,
     showHistory = true,
     showAudit = true,
-    show5v5 = false
+    show5v5 = false,
+    showR1 = true
   }
 end
 
@@ -448,6 +501,7 @@ local function saveOptions()
   updateConfig("showHistory", optionsFrame.showHistory:GetChecked())
   updateConfig("showAudit", optionsFrame.showAudit:GetChecked())
   updateConfig("show5v5", optionsFrame.show5v5:GetChecked())
+  updateConfig("showR1", optionsFrame.showR1:GetChecked())
   resetTempConfig()
 end
 
@@ -459,6 +513,7 @@ local function cancelOptions()
   optionsFrame.showHistory:SetChecked(PvPAuditConfig["showHistory"])
   optionsFrame.showAudit:SetChecked(PvPAuditConfig["showAudit"])
   optionsFrame.show5v5:SetChecked(PvPAuditConfig["show5v5"])
+  optionsFrame.showR1:SetChecked(PvPAuditConfig["showR1"])
 end
 
 local function defaultOptions()
@@ -484,7 +539,7 @@ local function createOptionsPanel()
   optionsFrame.title:SetPoint("TOPLEFT", xOffset, -20)
   optionsFrame.title:SetText("PvPAudit Options")
 
-  drawFontStyleOptions(optionsFrame, xOffset, -130)
+  drawFontStyleOptions(optionsFrame, xOffset, -160)
   drawHistoryTooltipOption(optionsFrame, xOffset, -200)
   drawAuditTooltipOption(optionsFrame, xOffset, -240)
   drawAuditOutputOptions(optionsFrame, xOffset, -280)
