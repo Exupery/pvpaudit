@@ -1,5 +1,6 @@
 local eventFrame = nil
 local arenaDb = nil
+local notesDb = nil
 
 local BRACKETS = { "2v2", "3v3" }
 
@@ -27,6 +28,11 @@ local function addToTooltip(tooltip, name)
       tooltip:AddLine(str)
       tooltip:Show()
     end
+  end
+
+  if notesDb[name] ~= nil then
+    tooltip:AddLine(notesDb[name])
+    tooltip:Show()
   end
 end
 
@@ -76,4 +82,5 @@ function PvPAuditLoadHoverModule()
 
   local playerAndRealm = PvPAuditGetPlayerAndRealm()
   arenaDb = PvPAuditArenaHistory[playerAndRealm]
+  notesDb = PvPAuditArenaHistory["notes"]
 end

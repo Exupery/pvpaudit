@@ -2,8 +2,11 @@ local PURPLE_TEAM = 0
 local GOLD_TEAM = 1
 local SPEC_ID_MAP = {}
 
+local NOTES = "notes"
+
 local eventFrame = nil
 local arenaDb = nil
+local notesDb = nil
 local currentMatch = {}
 
 local playerName = GetUnitName("player", false)
@@ -176,8 +179,12 @@ local function addonLoaded()
   if not PvPAuditArenaHistory[playerAndRealm] then
     PvPAuditArenaHistory[playerAndRealm] = {}
   end
-
   arenaDb = PvPAuditArenaHistory[playerAndRealm]
+
+  if not PvPAuditArenaHistory[NOTES] then
+    PvPAuditArenaHistory[NOTES] = {}
+  end
+  notesDb = PvPAuditArenaHistory[NOTES]
 
   fixInvalidData()
   checkAndSetBrackets("players")
