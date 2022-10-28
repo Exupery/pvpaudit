@@ -170,9 +170,9 @@ local function selectCategory(tab)
 end
 
 local function drawBracketTabs()
-  local xOffset = 0
+  local xOffset = 10
   for i, bracket in pairs(BRACKETS) do
-    local tab = CreateFrame("Button", bracketTabs:GetName().."Tab"..i, bracketTabs, "CharacterFrameTabButtonTemplate")
+    local tab = CreateFrame("Button", bracketTabs:GetName().."Tab"..i, bracketTabs, "CharacterFrameTabTemplate")
     tab:SetID(i)
     tab:SetText(bracket)
     tab:SetPoint("TOPLEFT", viewer, "BOTTOMLEFT", xOffset, 0)
@@ -184,18 +184,18 @@ local function drawBracketTabs()
 end
 
 local function drawCategoryTabs()
-  local xOffset = 0
+  local xOffset = -165
   local anchor = viewer
   local anchorPoint = "BOTTOMRIGHT"
   for i, cat in pairs(CATEGORIES) do
-    local tab = CreateFrame("Button", categoryTabs:GetName().."Tab"..i, categoryTabs, "CharacterFrameTabButtonTemplate")
+    local tab = CreateFrame("Button", categoryTabs:GetName().."Tab"..i, categoryTabs, "CharacterFrameTabTemplate")
     tab:SetID(i)
     tab:SetText(cat)
     tab:SetPoint("TOPRIGHT", anchor, anchorPoint, xOffset, 0)
     tab:SetScript("OnClick", selectCategory)
     anchor = tab
     anchorPoint = "TOPLEFT"
-    xOffset = 15
+    xOffset = 155
   end
   PanelTemplates_SetNumTabs(categoryTabs, table.getn(CATEGORIES))
   PanelTemplates_SetTab(categoryTabs, table.getn(CATEGORIES)) -- these tabs get drawn right to left

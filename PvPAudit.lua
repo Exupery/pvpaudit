@@ -71,7 +71,10 @@ local rankOneAchievements = {
   [13630] = "Notorious Gladiator: Battle for Azeroth Season 3",
   [13957] = "Corrupted Gladiator: Battle for Azeroth Season 4",
   -- SL
-  [14690] = "Sinful Gladiator: Shadowlands Season 1"
+  [14690] = "Sinful Gladiator: Shadowlands Season 1",
+  [14973] = "Unchained Gladiator: Shadowlands Season 2",
+  [15353] = "Cosmic Gladiator: Shadowlands Season 3",
+  [15606] = "Eternal Gladiator: Shadowlands Season 4"
 }
 
 local statistics = {
@@ -131,8 +134,8 @@ end
 
 local function sortedKeys(tbl)
   local sorted = {}
-  for k, _ in pairs(tbl) do
-    table.insert(sorted, k)
+  for i, _ in pairs(tbl) do
+    table.insert(sorted, i)
   end
   table.sort(sorted)
 
@@ -397,6 +400,15 @@ local function tidyCache()
   end
 end
 
+local function updateConfig(key, value)
+  PvPAuditConfig[key] = value
+  local updated = PvPAuditConfig[key] == value
+  if updated then
+    config = PvPAuditConfig
+  end
+  return updated
+end
+
 local function createLabel(text, parent, xOffset, yOffset)
   local label = parent:CreateFontString("PvPAudit"..text.."Label", "OVERLAY", "GameFontNormal")
   label:SetPoint("TOPLEFT", xOffset, yOffset)
@@ -419,18 +431,15 @@ local function setFontStyle(style)
 end
 
 local function fontStyleSelected(self)
-  tempConfig.fontstyle = self.value
-end
-
-local function getSelectedFontStyle()
-  return tempConfig.fontstyle ~= nil and tempConfig.fontstyle or config.fontstyle
+  setFontStyle(self.value)
+  updateConfig("fontstyle", self.value)
 end
 
 local function drawFontStyleOptions(parent, xOffset, yOffset)
   local label = createLabel("Font", parent, xOffset, yOffset)
 
   local fonts = sortedKeys(PVPAUDIT_FONTS)
-  local selectedFont = getSelectedFontStyle()
+  local selectedFont = config.fontstyle
   parent.fontstyle = createDropDown("PvPAuditFontStyle", parent, fontStyleSelected, fonts, selectedFont)
   parent.fontstyle:SetPoint("LEFT", label, "RIGHT", 0, 0)
 end
@@ -438,89 +447,83 @@ end
 local function drawConfigCheckOption(parent, xOffset, yOffset, title, description,
     uiOptionName, frameName, checked)
   local label = createLabel(title, parent, xOffset, yOffset)
+  local callback = function (self, button, down)
+    PvPAuditConfig[uiOptionName] = parent[uiOptionName]:GetChecked()
+  end
 
   parent[uiOptionName] = CreateFrame("CheckButton", frameName, parent, "ChatConfigCheckButtonTemplate")
   parent[uiOptionName]:SetPoint("LEFT", label, "RIGHT", 0, 0)
   parent[uiOptionName].tooltip = description
   parent[uiOptionName]:SetChecked(checked)
+  parent[uiOptionName]:SetScript("PostClick", callback)
   parent[uiOptionName]:Show()
 end
 
 local function drawHistoryTooltipOption(parent, xOffset, yOffset)
   drawConfigCheckOption(parent, xOffset, yOffset,
     "Show arena player history in tooltip",
-    "If checked arena W/L results will appear in player tooltips",
+    "If enabled arena W/L with player will appear in tooltips",
     "showHistory", "PvPAuditShowHistoryCheckBox", PvPAuditConfig["showHistory"])
 end
 
 local function drawAuditTooltipOption(parent, xOffset, yOffset)
   drawConfigCheckOption(parent, xOffset, yOffset,
     "Show arena audit results in tooltip",
-    "If checked the arena EXP/CR of previously audited players will appear in tooltips",
+    "If enabled the arena EXP/CR of previously audited players will appear in tooltips",
     "showAudit", "PvPAuditShowAuditCheckBox", PvPAuditConfig["showAudit"])
 end
 
 local function drawAuditOutputOptions(parent, xOffset, yOffset)
   drawConfigCheckOption(parent, xOffset, yOffset,
     "Include 5v5 in audit output",
-    "If checked audit output will include 5v5 EXP/CR",
+    "If enabled audit output will include 5v5 EXP/CR",
     "show5v5", "PvPAuditShow5v5CheckBox", PvPAuditConfig["show5v5"])
 
   drawConfigCheckOption(parent, xOffset, yOffset - 40,
     "Include Rank One titles in audit output",
-    "If checked audit output will include any/all Rank 1 titles obtained",
+    "If enabled audit output will include any/all Rank 1 titles obtained",
     "showR1", "PvPAuditShowR1CheckBox", PvPAuditConfig["showR1"])
-end
-
-local function updateConfig(key, value)
-  PvPAuditConfig[key] = value
-  local updated = PvPAuditConfig[key] == value
-  if updated then
-    config = PvPAuditConfig
-  end
-  return updated
-end
-
-local function resetTempConfig()
-  tempConfig = {}
 end
 
 local function defaultConfig()
   return {
     fontstyle = DEFAULT_FONT,
     showHistory = true,
-    showAudit = true,
+    showAudit = false,
     show5v5 = false,
     showR1 = true
   }
 end
 
-local function saveOptions()
-  setFontStyle(getSelectedFontStyle())
-  updateConfig("fontstyle", getSelectedFontStyle())
-  updateConfig("showHistory", optionsFrame.showHistory:GetChecked())
-  updateConfig("showAudit", optionsFrame.showAudit:GetChecked())
-  updateConfig("show5v5", optionsFrame.show5v5:GetChecked())
-  updateConfig("showR1", optionsFrame.showR1:GetChecked())
-  resetTempConfig()
+local function createDropdown(configKey, defaultValue, name, tooltip, options, getValue, setValue)
+  local setting = Settings.RegisterProxySetting(optionsFrame, configKey, PvPAuditConfig, "string", name, defaultValue, getValue, setValue, setValue)
+  Settings.CreateDropDown(optionsFrame, setting, options, tooltip)
 end
 
-local function cancelOptions()
-  resetTempConfig()
-  config = PvPAuditConfig
-  setFontStyle(PvPAuditConfig["fontstyle"])
-  optionsFrame.fontstyle:SetText(PvPAuditConfig["fontstyle"])
-  optionsFrame.showHistory:SetChecked(PvPAuditConfig["showHistory"])
-  optionsFrame.showAudit:SetChecked(PvPAuditConfig["showAudit"])
-  optionsFrame.show5v5:SetChecked(PvPAuditConfig["show5v5"])
-  optionsFrame.showR1:SetChecked(PvPAuditConfig["showR1"])
+local function createCheckBox(configKey, defaultValue, name, tooltip)
+  local setting = Settings.RegisterProxySetting(optionsFrame, configKey, PvPAuditConfig, "boolean", name, defaultValue)
+  Settings.CreateCheckBox(optionsFrame, setting, tooltip)
 end
 
-local function defaultOptions()
-  config = defaultConfig()
-  PvPAuditConfig = defaultConfig()
-  InterfaceOptionsFrame:Hide()
-  resetTempConfig()
+local function createFontDropdown()
+  local function getOptions()
+    local fonts = sortedKeys(PVPAUDIT_FONTS)
+    local container = Settings.CreateControlTextContainer()
+    for i, fontName in pairs(fonts) do
+      container:Add(fontName, fontName)
+    end
+    return container:GetData()
+  end
+
+  local function getValue()
+    return PvPAuditConfig["fontstyle"]
+  end
+
+  local function setValue(fontName)
+    return PVPAUDIT_FONTS[fontName]
+  end
+
+  createDropdown("fontstyle", DEFAULT_FONT, "Font", "The font used in the arena partner history viewer", getOptions, getValue, setValue)
 end
 
 local function createOptionsPanel()
@@ -531,20 +534,34 @@ local function createOptionsPanel()
   optionsFrame.name = "PvPAudit"
   InterfaceOptions_AddCategory(optionsFrame)
 
-  optionsFrame.okay = saveOptions
-  optionsFrame.cancel = cancelOptions
-  optionsFrame.default = defaultOptions
-
   optionsFrame.title = optionsFrame:CreateFontString("PvPAuditOptionsTitle", "OVERLAY", "GameFontNormalLarge")
   optionsFrame.title:SetPoint("TOPLEFT", xOffset, -20)
   optionsFrame.title:SetText("PvPAudit Options")
 
-  drawFontStyleOptions(optionsFrame, xOffset, -160)
-  drawHistoryTooltipOption(optionsFrame, xOffset, -200)
-  drawAuditTooltipOption(optionsFrame, xOffset, -240)
-  drawAuditOutputOptions(optionsFrame, xOffset, -280)
+  drawFontStyleOptions(optionsFrame, xOffset, -60)
+  drawHistoryTooltipOption(optionsFrame, xOffset, -100)
+  drawAuditTooltipOption(optionsFrame, xOffset, -140)
+  drawAuditOutputOptions(optionsFrame, xOffset, -180)
 
-  optionsFrame.fontstyle:SetText(getSelectedFontStyle())
+  optionsFrame.fontstyle:SetText(config.fontstyle)
+end
+
+local function createOptionsPanelNew()
+  config = PvPAuditConfig
+  optionsFrame = Settings.RegisterVerticalLayoutCategory("PvPAudit")
+
+  createFontDropdown()
+
+  createCheckBox("showHistory", true, "Show arena player history in tooltip",
+    "If enabled arena W/L with player will appear in tooltips")
+  createCheckBox("showAudit", false, "Show arena audit results in tooltip",
+    "If enabled the arena EXP/CR of previously audited players will appear in tooltips")
+  createCheckBox("show5v5", false, "Include 5v5 in audit output",
+    "If enabled audit output will include 5v5 EXP/CR")
+  createCheckBox("showR1", true, "Include Rank One titles in audit output",
+    "If enabled audit output will include any/all Rank 1 titles obtained")
+
+  Settings.RegisterAddOnCategory(optionsFrame)
 end
 
 local function addonLoaded()
@@ -557,8 +574,8 @@ local function addonLoaded()
   if not PvPAuditConfig then
     PvPAuditConfig = defaultConfig()
   end
-  for k, v in pairs(defaultConfig()) do
-    if PvPAuditConfig[k] == nil then PvPAuditConfig[k] = v end
+  for i, v in pairs(defaultConfig()) do
+    if PvPAuditConfig[i] == nil then PvPAuditConfig[i] = v end
   end
 
   createOptionsPanel()
@@ -613,9 +630,8 @@ SlashCmdList["PVPAUDIT"] = function(arg)
   elseif string.match(arg, "h.*") then
     PvPAuditHistoryCmd(arg)
   elseif string.match(arg, "config") then
-    -- call twice to workaround WoW bug where very first call opens wrong tab
-    InterfaceOptionsFrame_OpenToCategory("PvPAudit")
-    InterfaceOptionsFrame_OpenToCategory("PvPAudit")
+    -- Settings.OpenToCategory(optionsFrame:GetID(), "PvPAudit")
+    InterfaceOptionsFrame_OpenToCategory("PvPAudit") -- Deprecated but above doesn't yet work
   elseif string.match(arg, "clear.*") then
     PvPArenaHistoryClear(arg)
   else
