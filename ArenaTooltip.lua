@@ -63,8 +63,9 @@ local function tooltipOnShow(tooltip)
 end
 
 local function tooltipUnitUpdate(tooltip)
+  if tooltip == nil then return end
   local _, unit = tooltip:GetUnit()
-  if tooltip:IsUnit("player") or not unit then return end
+  if not unit then return end
 
   local name = GetUnitName(unit, true)
   addToTooltip(tooltip, name)
@@ -77,7 +78,7 @@ function PvPAuditLoadHoverModule()
   eventFrame = CreateFrame("Frame", "PvPAuditHoverEventFrame", UIParent)
   eventFrame:SetScript("OnEvent", eventHandler)
 
-  GameTooltip:HookScript("OnTooltipSetUnit", tooltipUnitUpdate)
+  TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, tooltipUnitUpdate)
   GameTooltip:HookScript("OnShow", tooltipOnShow)
 
   local playerAndRealm = PvPAuditGetPlayerAndRealm()
