@@ -77,7 +77,7 @@ local rankOneAchievements = {
   [15606] = "Eternal Gladiator: Shadowlands Season 4",
   -- DF
   [15951] = "Crimson Gladiator: Dragonflight Season 1",
-  [16734] = "Crimson Soloist: Dragonflight Season 1"
+  [16734] = "Crimson Legend: Dragonflight Season 1"
 }
 
 local statistics = {
