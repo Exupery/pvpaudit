@@ -2,7 +2,7 @@
 ## Title: PvPAudit
 ## Notes: Audits potential PvP partners
 ## Author: Exuperjun - Emerald Dream
-## Version: 2.5.15
+## Version: 2.5.16
 ## SavedVariables: PvPAuditPlayerCache, PvPAuditArenaHistory, PvPAuditConfig
 
 Libs\LibStub\LibStub.lua
