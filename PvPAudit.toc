@@ -1,4 +1,4 @@
-## Interface: 100100
+## Interface: 100105
 ## Title: PvPAudit
 ## Notes: Audits potential PvP partners
 ## Author: Exuperjun - Emerald Dream

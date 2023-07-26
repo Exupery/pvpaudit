@@ -206,7 +206,7 @@ local function eventHandler(self, event, unit, ...)
     storeTempMetadata()
   elseif event == "ZONE_CHANGED_NEW_AREA" and not isArena then
     currentMatch = {}
-  elseif event == "ADDON_LOADED" and unit == "PvPAudit" then
+  elseif event == "ADDON_LOADED" and string.lower(unit) == "pvpaudit" then
     addonLoaded()
   end
 end
