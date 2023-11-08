@@ -79,7 +79,9 @@ local rankOneAchievements = {
   [15951] = "Crimson Gladiator: Dragonflight Season 1",
   [16734] = "Crimson Legend: Dragonflight Season 1",
   [17764] = "Obsidian Gladiator: Dragonflight Season 2",
-  [17767] = "Obsidian Legend: Dragonflight Season 2"
+  [17767] = "Obsidian Legend: Dragonflight Season 2",
+  [19132] = "Verdant Gladiator: Dragonflight Season 3",
+  [19131] = "Verdant Legend: Dragonflight Season 3"
 }
 
 local statistics = {
