@@ -1,8 +1,8 @@
-## Interface: 100200
+## Interface: 100205
 ## Title: PvPAudit
 ## Notes: Audits potential PvP partners
 ## Author: Exuperjun - Emerald Dream
-## Version: 2.5.18
+## Version: 2.5.19
 ## IconTexture: Interface\AddOns\PvPAudit\PvPAudit.tga
 ## SavedVariables: PvPAuditPlayerCache, PvPAuditArenaHistory, PvPAuditConfig
 
