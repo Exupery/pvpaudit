@@ -539,7 +539,9 @@ local function createOptionsPanel()
   local xOffset = 20
   optionsFrame = CreateFrame("Frame", "PvPAuditOptions", UIParent)
   optionsFrame.name = "PvPAudit"
-  InterfaceOptions_AddCategory(optionsFrame)
+  local category, _ = Settings.RegisterCanvasLayoutCategory(optionsFrame, optionsFrame.name, optionsFrame.name)
+  category.ID = optionsFrame.name
+  Settings.RegisterAddOnCategory(category)
 
   optionsFrame.title = optionsFrame:CreateFontString("PvPAuditOptionsTitle", "OVERLAY", "GameFontNormalLarge")
   optionsFrame.title:SetPoint("TOPLEFT", xOffset, -20)
@@ -637,8 +639,7 @@ SlashCmdList["PVPAUDIT"] = function(arg)
   elseif string.match(arg, "h.*") then
     PvPAuditHistoryCmd(arg)
   elseif string.match(arg, "config") then
-    -- Settings.OpenToCategory(optionsFrame:GetID(), "PvPAudit")
-    InterfaceOptionsFrame_OpenToCategory("PvPAudit") -- Deprecated but above doesn't yet work
+    Settings.OpenToCategory("PvPAudit")
   elseif string.match(arg, "clear.*") then
     PvPArenaHistoryClear(arg)
   else
