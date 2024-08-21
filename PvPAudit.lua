@@ -81,7 +81,12 @@ local rankOneAchievements = {
   [17764] = "Obsidian Gladiator: Dragonflight Season 2",
   [17767] = "Obsidian Legend: Dragonflight Season 2",
   [19132] = "Verdant Gladiator: Dragonflight Season 3",
-  [19131] = "Verdant Legend: Dragonflight Season 3"
+  [19131] = "Verdant Legend: Dragonflight Season 3",
+  [19454] = "Draconic Gladiator: Dragonflight Season 4",
+  [19453] = "Draconic Legend: Dragonflight Season 4",
+  -- TWW
+  [40380] = "Forged Gladiator: The War Within Season 1",
+  [40381] = "Forged Legend: The War Within Season 1"
 }
 
 local statistics = {
@@ -223,7 +228,6 @@ local function init()
 end
 
 local function cleanup(auditFunction)
-  attempts = 0
   groupAuditsCompleted = groupAuditsCompleted + 1
   local nextTarget = groupAuditTargets[groupAuditsCompleted]
   if nextTarget ~= nil then
@@ -333,7 +337,6 @@ local function onUpdate(self, elapsed)
   if auditTarget ~= TARGET and groupAuditsCompleted < GetNumGroupMembers() then
     groupAuditTime = groupAuditTime + elapsed
     if groupAuditTime >= 1 then
-      attempts = 0
       groupAuditTime = 0
       audit(auditTarget)
     end
