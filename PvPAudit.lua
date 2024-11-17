@@ -4,7 +4,15 @@ BINDING_HEADER_PVPAUDIT = "PvPAudit"
 BINDING_NAME_PVPAUDIT1 = "Audit the current target"
 
 local TARGET = "target"
-local BRACKETS = { "2v2", "3v3", "5v5", "RBG" }
+local BRACKET_ORDER = { 7, 1, 2, 3, 9, 4 }
+local BRACKETS = {
+  [1] = "2v2",
+  [2] = "3v3",
+  [3] = "5v5",
+  [4] = "RBG",
+  [7] = "Shuffle",
+  [9] = "Blitz"
+}
 local MAX_CACHE_AGE = 2592000 -- 30 DAYS
 
 local DEFAULT_FONT = "Arial"
@@ -175,17 +183,20 @@ local function printRating(playerSlug, bracket)
   local highest = PvPAuditPlayerCache[playerSlug][bracket]["highest"]
   local cr = PvPAuditPlayerCache[playerSlug][bracket]["cr"]
 
-  local str = auditBracket and "" or (bracket .. "   ")
-  str = str .. highest .. " EXP "
+  local str = auditBracket and "" or (bracket .. "    ")
+  str = str .. cr .. " CR "
   if printTo == nil then str = str .. "|cffb2b2b2" end
-  str = str .. "[" .. cr .. " CR]"
+  if highest ~= nil then
+    str = str .. "[" .. highest .. " EXP]"
+  end
 
   output(str)
 end
 
 -- Print player's ratings for ALL brackets
 local function printRatings(playerSlug)
-  for _, bracket in pairs(BRACKETS) do
+  for _, i in pairs(BRACKET_ORDER) do
+    bracket = BRACKETS[i]
     printRating(playerSlug, bracket)
   end
 end
@@ -313,7 +324,8 @@ end
 local function getCurrentRatings()
   targetCurrentRatings = {}
 
-  for i, b in pairs(BRACKETS) do
+  for _, i in pairs(BRACKET_ORDER) do
+    local b = BRACKETS[i]
     local cr = GetInspectArenaData(i)
     targetCurrentRatings[b] = cr
   end
@@ -346,11 +358,11 @@ end
 local function cacheRatings(playerSlug)
   for _, b in pairs(BRACKETS) do
     local highest
-    if b ~= "RBG" then
+    if b == "RBG" then
+      highest = getRbgHighest()
+    elseif statistics[b] ~= nil then
       highest = GetComparisonStatistic(statistics[b])
       if tonumber(highest) == 1500 then highest = "< 1500" end
-    else
-      highest = getRbgHighest()
     end
 
     local cr = targetCurrentRatings[b]
@@ -666,6 +678,10 @@ SlashCmdList["PVPAUDIT"] = function(arg)
       auditBracket = BRACKETS[3]
     elseif string.match(arg:lower(), ".*rbg.*") then
       auditBracket = BRACKETS[4]
+    elseif string.match(arg:lower(), ".*shuffle.*") then
+      auditBracket = BRACKETS[7]
+    elseif string.match(arg:lower(), ".*blitz.*") then
+      auditBracket = BRACKETS[9]
     else
       auditBracket = nil
     end

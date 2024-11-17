@@ -5,7 +5,8 @@ PvPAudit helps you find appropriate PvP partners by making it easy to quickly se
 * your history with another player (arena only)
 * your history with each comp you've played (arena only)
 * your history on each map (arena only)
-* the PvP experience and current ratings of another player (arena and RBGs)
+* the current ratings of another player (arena, RBGs, Solo Shuffle, and BG Blitz)
+* the highest ratings of another player (arena and RBGs only)
 
 ## Arena History
 For any player your current character has played one or more (rated) arena matches with the tooltip (both regular tooltip and the one used by the LFG tool) will display:
@@ -29,6 +30,7 @@ Please note Blizzard requires some proximity to collect the necessary data so ru
 
 ### Caveats
 * The exact highest rating can only be obtained for arenas, for RBGs the highest achievement earned is used.
+* Blizzard's in-game API currently doesn't support retrieving a player's historical high for either Solo Shuffle or BG Blitz.
 * WoW's compare achievements functionality (used for determining what achievements the target has earned) returns achievements a player has earned on any character on that account by default, not just that specific character (players can toggle this in Interface => Display). As a result a character's highest rating may be lower than what would seem required for an achievement.
 * WoW's API for getting arena info often has a short (about a second) delay, this is only slightly noticeable when auditing a single target but more pronounced if doing a group audit on a large raid
 
@@ -53,5 +55,3 @@ Examples: `/pvpaudit 3v3`, `/pvpaudit i 2`, `/pvpaudit raid rbg`
 
 Commands can be ran with `/pa` instead of `/pvpaudit` - unless another addon is in use that registers `/pa` (in which case the longer option should be used). Additionally, auditing the current target can be keybound via the WoW keybinding interface (Key Bindings => Addons => PvPAudit).
 
-## TODOS
-* include opposing comps in the history viewer

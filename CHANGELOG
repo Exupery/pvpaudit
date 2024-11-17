@@ -1,6 +1,10 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v2.6
+- added Solo Shuffle and BG Blitz to audit output
+- changed audit output order to print CR first
+
 v2.5.23
 - updated for 11.0.5
 
