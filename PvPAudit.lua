@@ -94,7 +94,9 @@ local rankOneAchievements = {
   [19453] = "Draconic Legend: Dragonflight Season 4",
   -- TWW
   [40380] = "Forged Gladiator: The War Within Season 1",
-  [40381] = "Forged Legend: The War Within Season 1"
+  [40381] = "Forged Legend: The War Within Season 1",
+  [41032] = "Prized Gladiator: The War Within Season 2",
+  [41355] = "Prized Legend: The War Within Season 2"
 }
 
 local statistics = {
@@ -589,6 +591,8 @@ local function createOptionsPanelNew()
 end
 
 local function addonLoaded()
+  local firstLoad = false
+
   if not PvPAuditPlayerCache then
     PvPAuditPlayerCache = {}
   else
@@ -596,6 +600,7 @@ local function addonLoaded()
   end
 
   if not PvPAuditConfig then
+    firstLoad = true
     PvPAuditConfig = defaultConfig()
   end
   for i, v in pairs(defaultConfig()) do
@@ -604,7 +609,9 @@ local function addonLoaded()
 
   createOptionsPanel()
 
-  print("PvPAudit loaded, to audit the current target type /pvpaudit")
+  if firstLoad then
+    print("PvPAudit loaded, to audit the current target type /pvpaudit")
+  end
 end
 
 local function eventHandler(self, event, unit, ...)
