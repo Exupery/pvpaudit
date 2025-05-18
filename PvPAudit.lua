@@ -95,7 +95,7 @@ local rankOneAchievements = {
   -- TWW
   [40380] = "Forged Gladiator: The War Within Season 1",
   [40381] = "Forged Legend: The War Within Season 1",
-  [41032] = "Prized Gladiator: The War Within Season 2",
+  [41354] = "Prized Gladiator: The War Within Season 2",
   [41355] = "Prized Legend: The War Within Season 2"
 }
 

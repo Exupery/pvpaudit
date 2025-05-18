@@ -2,7 +2,7 @@
 ## Title: PvPAudit
 ## Notes: Audits potential PvP partners
 ## Author: Exuperjun - Emerald Dream
-## Version: 2.6.3
+## Version: 2.6.4
 ## IconTexture: Interface\AddOns\PvPAudit\PvPAudit.tga
 ## SavedVariables: PvPAuditPlayerCache, PvPAuditArenaHistory, PvPAuditConfig
 
