@@ -99,6 +99,7 @@ local rankOneAchievements = {
   [41355] = "Prized Legend: The War Within Season 2",
   [42036] = "Astral Gladiator: The War Within Season 3",
   [42033] = "Astral Legend: The War Within Season 3"
+  -- Midnight
 }
 
 local statistics = {
@@ -152,7 +153,7 @@ local function output(msg)
   if printTo == nil then
     print(msg)
   else
-    SendChatMessage(msg, printTo)
+    C_ChatInfo.SendChatMessage(msg, printTo)
   end
 end
 
@@ -253,8 +254,10 @@ local function cleanup(auditFunction)
     groupAuditTime = 0
     groupAuditsCompleted = 0
     groupAuditTargets = {}
-    eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
-    eventFrame:UnregisterEvent("INSPECT_READY")
+    if (eventFrame ~= nil) then
+      eventFrame:UnregisterEvent("INSPECT_ACHIEVEMENT_READY")
+      eventFrame:UnregisterEvent("INSPECT_READY")
+    end
   end
 end
 
@@ -274,14 +277,16 @@ local function audit(target)
   init()
 
   local reset = true
-  local canInspect = CanInspect(auditTarget, false)
+  local canInspect = CanInspect(auditTarget)
 
   if canInspect then
     local name = UnitName(auditTarget)
     local inRange = UnitIsVisible(auditTarget) or CheckInteractDistance(auditTarget, 1)
     if inRange then
       reset = false
-      eventFrame:RegisterEvent("INSPECT_READY")
+      if (eventFrame ~= nil) then
+        eventFrame:RegisterEvent("INSPECT_READY")
+      end
       NotifyInspect(auditTarget)
     else
       local _, _, slug = getNameRealmSlug()
@@ -405,7 +410,9 @@ end
 
 local function onInspectReady()
   getCurrentRatings()
-  eventFrame:RegisterEvent("INSPECT_ACHIEVEMENT_READY")
+  if (eventFrame ~= nil) then
+    eventFrame:RegisterEvent("INSPECT_ACHIEVEMENT_READY")
+  end
   SetAchievementComparisonUnit(auditTarget)
 end
 
