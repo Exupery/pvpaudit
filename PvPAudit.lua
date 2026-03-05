@@ -98,8 +98,10 @@ local rankOneAchievements = {
   [41354] = "Prized Gladiator: The War Within Season 2",
   [41355] = "Prized Legend: The War Within Season 2",
   [42036] = "Astral Gladiator: The War Within Season 3",
-  [42033] = "Astral Legend: The War Within Season 3"
+  [42033] = "Astral Legend: The War Within Season 3",
   -- Midnight
+  [61180] = "Galactic Gladiator: Midnight Season 1",
+  [61179] = "Galactic Legend: Midnight Season 1"
 }
 
 local statistics = {

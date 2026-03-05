@@ -1,6 +1,10 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v2.6.10
+- added Midnight Season 1 R1 titles
+- resolved error that could occur on some NPC tooltips
+
 v2.6.9
 - updated for Midnight
 

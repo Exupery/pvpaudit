@@ -47,7 +47,7 @@ local function tooltipOnShow(tooltip)
       local leader = searchResultInfo.leaderName
       local groupName = searchResultInfo.name
       if txt == groupName then
-        addToTooltip(tooltip, leader)
+        pcall(addToTooltip, tooltip, leader)
       end
     end
 
@@ -56,7 +56,7 @@ local function tooltipOnShow(tooltip)
     for _, a in pairs(applicants) do
       local name = C_LFGList.GetApplicantMemberInfo(a, 1)
       if txt == name then
-        addToTooltip(tooltip, name)
+        pcall(addToTooltip, tooltip, name)
       end
     end
   end
@@ -67,8 +67,11 @@ local function tooltipUnitUpdate(tooltip)
   local _, unit = tooltip:GetUnit()
   if not unit then return end
 
-  local name = GetUnitName(unit, true)
-  addToTooltip(tooltip, name)
+  local name, realm = UnitName(unit)
+  if name and realm and realm ~= "" then
+    name = name .. "-" .. realm
+  end
+  pcall(addToTooltip, tooltip, name)
 end
 
 local function eventHandler(self, event, unit, ...)
