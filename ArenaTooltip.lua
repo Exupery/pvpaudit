@@ -37,6 +37,7 @@ local function addToTooltip(tooltip, name)
 end
 
 local function tooltipOnShow(tooltip)
+  if InCombatLockdown() then return end
   if tooltip:NumLines() > 0 then
     local line = _G[tooltip:GetName() .. "TextLeft1"]
     local txt = line:GetText()
@@ -63,15 +64,19 @@ local function tooltipOnShow(tooltip)
 end
 
 local function tooltipUnitUpdate(tooltip)
+  if InCombatLockdown() then return end
   if tooltip == nil then return end
   local _, unit = tooltip:GetUnit()
   if not unit then return end
 
   local name, realm = UnitName(unit)
-  if name and realm and realm ~= "" then
-    name = name .. "-" .. realm
-  end
-  pcall(addToTooltip, tooltip, name)
+  local ok, result = pcall(function()
+    if name and realm and realm ~= "" then
+      return name .. "-" .. realm
+    end
+    return name
+  end)
+  pcall(addToTooltip, tooltip, ok and result or name)
 end
 
 local function eventHandler(self, event, unit, ...)

@@ -275,6 +275,10 @@ local function getNameRealmSlug()
 end
 
 local function audit(target)
+  if InCombatLockdown() then
+    errorPrint("Cannot audit during combat")
+    return
+  end
   auditTarget = target
   init()
 

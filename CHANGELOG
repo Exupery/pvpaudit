@@ -1,6 +1,9 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v2.6.11
+- do not allow auditing during combat to avoid Midnight taint issues
+
 v2.6.10
 - added Midnight Season 1 R1 titles
 - resolved error that could occur on some NPC tooltips
