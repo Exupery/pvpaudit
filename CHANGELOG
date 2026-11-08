@@ -1,6 +1,10 @@
 PVPAUDIT CHANGE LOG
 ===================
 
+v2.7
+- added tracking for shuffle W/L by map and spec
+- added option to automatically remove previous season data
+
 v2.6.15
 - updated for 12.1.5
 

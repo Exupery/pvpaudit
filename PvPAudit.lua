@@ -32,6 +32,7 @@ PVPAUDIT_FONTS = {
 
 local eventFrame = nil
 local optionsFrame = nil
+local optionsCategory = nil
 local config = {}
 local tempConfig = {}
 
@@ -524,13 +525,34 @@ local function drawAuditOutputOptions(parent, xOffset, yOffset)
     "showR1", "PvPAuditShowR1CheckBox", PvPAuditConfig["showR1"])
 end
 
+local function drawSeasonPurgeOptions(parent, xOffset, yOffset)
+  local header = parent:CreateFontString("PvPAuditSeasonPurgeHeader", "OVERLAY", "GameFontNormalLarge")
+  header:SetPoint("TOPLEFT", xOffset, yOffset)
+  header:SetText("Automatically purge previous season data")
+
+  local purgeOptions = {
+    { "Maps", "map W/L", "purgeMaps", "PvPAuditPurgeMapsCheckBox" },
+    { "Comps/Specs", "team composition and Solo Shuffle spec W/L", "purgeComps", "PvPAuditPurgeCompsCheckBox" },
+    { "Players", "W/L with players", "purgePlayers", "PvPAuditPurgePlayersCheckBox" },
+  }
+  for i, option in ipairs(purgeOptions) do
+    local title, data, key, frameName = unpack(option)
+    drawConfigCheckOption(parent, xOffset, yOffset - 40 * i, title,
+      "If enabled " .. data .. " from previous arena seasons is removed the first time you log in during a new season",
+      key, frameName, PvPAuditConfig[key])
+  end
+end
+
 local function defaultConfig()
   return {
     fontstyle = DEFAULT_FONT,
     showHistory = true,
     showAudit = false,
     show5v5 = false,
-    showR1 = true
+    showR1 = true,
+    purgeMaps = false,
+    purgeComps = false,
+    purgePlayers = false
   }
 end
 
@@ -571,9 +593,8 @@ local function createOptionsPanel()
   local xOffset = 20
   optionsFrame = CreateFrame("Frame", "PvPAuditOptions", UIParent)
   optionsFrame.name = "PvPAudit"
-  local category, _ = Settings.RegisterCanvasLayoutCategory(optionsFrame, optionsFrame.name, optionsFrame.name)
-  category.ID = optionsFrame.name
-  Settings.RegisterAddOnCategory(category)
+  optionsCategory = Settings.RegisterCanvasLayoutCategory(optionsFrame, optionsFrame.name, optionsFrame.name)
+  Settings.RegisterAddOnCategory(optionsCategory)
 
   optionsFrame.title = optionsFrame:CreateFontString("PvPAuditOptionsTitle", "OVERLAY", "GameFontNormalLarge")
   optionsFrame.title:SetPoint("TOPLEFT", xOffset, -20)
@@ -583,6 +604,7 @@ local function createOptionsPanel()
   drawHistoryTooltipOption(optionsFrame, xOffset, -100)
   drawAuditTooltipOption(optionsFrame, xOffset, -140)
   drawAuditOutputOptions(optionsFrame, xOffset, -180)
+  drawSeasonPurgeOptions(optionsFrame, xOffset, -280)
 
   optionsFrame.fontstyle:SetText(config.fontstyle)
 end
@@ -676,7 +698,8 @@ SlashCmdList["PVPAUDIT"] = function(arg)
   elseif string.match(arg, "h.*") then
     PvPAuditHistoryCmd(arg)
   elseif string.match(arg, "config") then
-    Settings.OpenToCategory("PvPAudit")
+    -- Settings.OpenToCategory() needs the numeric ID of the category (not its name) since Midnight
+    if optionsCategory then Settings.OpenToCategory(optionsCategory:GetID()) end
   elseif string.match(arg, "clear.*") then
     PvPArenaHistoryClear(arg)
   else

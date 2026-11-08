@@ -4,7 +4,8 @@ PvPAudit helps you find appropriate PvP partners by making it easy to quickly se
 
 * your history with another player (arena only)
 * your history with each comp you've played (arena only)
-* your history on each map (arena only)
+* your history on each map (arena and shuffle only)
+* your history with and against each spec in solo shuffle
 * the current ratings of another player (arena, RBGs, Solo Shuffle, and BG Blitz)
 * the highest ratings of another player (arena and RBGs only)
 
